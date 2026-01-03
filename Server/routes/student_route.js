@@ -5,4 +5,4 @@ student_route = express.Router()
 
 student_route.get("/all/score",over_score)
 student_route.get("/subject/score",subjects_score)
-student_route.get("attendance/data",attendance_record)
+student_route.get("/attendance/data",attendance_record)

@@ -1,14 +1,21 @@
 import express from "express"
 import pool from "./connections/db_connent.js"
 
+
 // routes
 import auth_route from "./routes/auth_route.js"
+import { hod_db } from "./db/hod_db.js"
+import { auth_middleware } from "./middlewares/auth_middlware.js"
 
 
 // calling modules here
 
 let app = express()
 
+// middleware 
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -29,16 +36,18 @@ return console.log(err)
 }
 connection_fun()
 
+hod_db()
+
 
 
 //  using routes here
 
 app.use("/auth",auth_route)
 
-
-app.get("/",(req,res)=>{
-    res.send("hi muzammil")
+app.get("/",auth_middleware,(req,res)=>{
+    return res.send("server is stared")
 })
+
 
 
 
