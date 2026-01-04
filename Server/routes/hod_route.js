@@ -1,8 +1,8 @@
 import express from "express"
-import {add_classes, add_courses, add_student, add_teacher, add_teacher_to_subject_and_class, delete_classes, delete_courses, delete_student, delete_subject, delete_teacher, download_attendance, read_classes, read_courses, read_student, read_teacher, see_particular_class, see_particular_course, see_particular_student, see_particular_subject, show_all_attendance, update_classes, update_courses, update_student, update_teacher, update_teacher_to_subject_and_class } from "../controllers/hod_controller"
+import {add_classes, add_courses, add_student, add_teacher, add_teacher_to_subject_and_class, delete_classes, delete_courses, delete_student, delete_subject, delete_teacher, download_attendance, read_classes, read_courses, read_student, read_teacher, see_particular_class, see_particular_course, see_particular_student, see_particular_subject, show_all_attendance, update_classes, update_courses, update_student, update_teacher, update_teacher_to_subject_and_class } from "../controllers/hod_controller.js"
 
 
-let hod_route = express.Router()
+export const hod_route = express.Router()
 // CRUD OPERATION OF TEACHER
 
 hod_route.post("/add/teacher",add_teacher)

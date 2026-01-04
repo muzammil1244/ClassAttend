@@ -6,8 +6,8 @@ import pool from "./connections/db_connent.js"
 import auth_route from "./routes/auth_route.js"
 import { hod_db } from "./db/hod_db.js"
 import { auth_middleware } from "./middlewares/auth_middlware.js"
-
-
+import { teacher_db } from "./db/teacher_db.js"
+import {hod_route} from "./routes/hod_route.js"
 // calling modules here
 
 let app = express()
@@ -37,13 +37,13 @@ return console.log(err)
 connection_fun()
 
 hod_db()
-
+teacher_db()
 
 
 //  using routes here
 
 app.use("/auth",auth_route)
-
+app.use("/hod",auth_middleware,hod_route)
 app.get("/",auth_middleware,(req,res)=>{
     return res.send("server is stared")
 })

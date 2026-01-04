@@ -66,6 +66,58 @@ export const login = async (req, res) => {
 
 
 
+    }if(role == "teacher"){
+
+
+  try {
+            let sql = `SELECT * from teacher_db WHERE email = ?`
+
+            let [data] = await pool.query(sql, [email])
+            let stored_pass = data[0].pass
+
+            // comparing work to password
+
+            let is_user = await bcrypt.compare(password, stored_pass)
+
+            if (!is_user) {
+                return res.status(400).json({
+                    message: "something wrong email or password"
+                })
+            }
+
+
+            // jwt work 
+
+            let payload = {
+                id: data[0].id,
+                email: data[0].email
+            }
+
+            let token = await jwt.sign(payload,process.env.JWT_key,{expiresIn:"1h"})
+
+            if(!token){
+                return res.status(500).json({
+                    message:"token is not generated"
+                })
+            }
+
+
+
+
+
+            return res.status(200).json({
+                message: "now user is loged",
+                token: token
+            })
+        } catch (err) {
+
+            return res.status(500).json({
+                message: err
+            })
+        }
+
+
+
     }
 
 

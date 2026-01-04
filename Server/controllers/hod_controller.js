@@ -1,5 +1,5 @@
 
-
+import pool from "../connections/db_connent.js"
 
 
 
@@ -8,8 +8,34 @@
 // CRUD  OPERATION WITH TEACHERS
 
 
-export const add_teacher = (res,req)=>{
-    return res.send("hi add teacher")
+export const add_teacher =async (req,res)=>{
+
+    let {email,password,name} = req.body
+    try {
+
+        if(!email || !password || !name){
+            return res.send(" all field required for adding teacher ")
+        }
+    let hod_id = req.user?.id
+
+    if(!hod_id){
+        return res.send("hod id not found here")
+    }
+
+
+        let slq = `
+        INSERT INTO teacher_db(email,password,name,hod_id) VALUES(?,?,?,?)
+        `
+await pool.query(slq,[email,password,name,hod_id])
+
+return res.send("teacher data have submitted")
+
+        
+    } catch (error) {
+        
+    }
+
+
 }
 
 
