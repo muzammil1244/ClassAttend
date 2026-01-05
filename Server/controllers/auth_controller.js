@@ -19,6 +19,11 @@ export const login = async (req, res) => {
             let sql = `SELECT * from hod_db WHERE email = ?`
 
             let [data] = await pool.query(sql, [email])
+            if(!data){
+                return res.json({
+                    message:"the hod email is not registered ever"
+                })
+            }
             let stored_pass = data[0].pass
 
             // comparing work to password
@@ -52,13 +57,13 @@ export const login = async (req, res) => {
 
 
             return res.status(200).json({
-                message: "now user is loged",
+                message: "now user is logged",
                 token: token
             })
         } catch (err) {
 
             return res.status(500).json({
-                message: err
+                message: "the hod email is not registered ever"
             })
         }
 
@@ -73,7 +78,12 @@ export const login = async (req, res) => {
             let sql = `SELECT * from teacher_db WHERE email = ?`
 
             let [data] = await pool.query(sql, [email])
-            let stored_pass = data[0].pass
+
+            if(!data){
+                return res.status(400).json({message:"this email is not registered with this account"})
+            }
+
+            let stored_pass = data[0].password
 
             // comparing work to password
 
@@ -106,13 +116,13 @@ export const login = async (req, res) => {
 
 
             return res.status(200).json({
-                message: "now user is loged",
+                message: "now teacher is logged",
                 token: token
             })
         } catch (err) {
 
             return res.status(500).json({
-                message: err
+              message:"this email is not registered with this account"
             })
         }
 

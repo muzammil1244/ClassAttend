@@ -9,6 +9,7 @@ password VARCHAR(225),
 name VARCHAR(225),
 hod_id INT,
 add_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+gender CHAR(1),
 FOREIGN KEY (hod_id) REFERENCES hod_db(id)
 )
 `

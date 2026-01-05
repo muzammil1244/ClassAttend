@@ -6,8 +6,8 @@ export const hod_route = express.Router()
 // CRUD OPERATION OF TEACHER
 
 hod_route.post("/add/teacher",add_teacher)
-hod_route.patch("/update/teacher",update_teacher)
-hod_route.delete("/delete/teacher",delete_teacher)
+hod_route.patch("/update/teacher/:id",update_teacher)
+hod_route.delete("/delete/teacher/:id",delete_teacher)
 hod_route.get("/read/teacher",read_teacher)
 
 // CRUD OPERATION OF STUDENT
@@ -19,7 +19,7 @@ hod_route.get("/read/student",read_student)
 
 // CRUD OPERATION OF STUDENT
 hod_route.post("/add/course",add_courses)
-hod_route.patch("/update/course",update_courses)
+hod_route.patch("/update/course/:id",update_courses)
 hod_route.delete("/delete/course",delete_courses)
 hod_route.get("/read/course",read_courses)
 

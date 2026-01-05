@@ -1,6 +1,5 @@
 
 
-
 // CRUD OPERATION OF WITH STUDENT
 
 export const add_student =(req,res)=>{
