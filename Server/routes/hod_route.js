@@ -17,17 +17,17 @@ hod_route.patch("/update/student",update_student)
 hod_route.delete("/delete/student",delete_student)
 hod_route.get("/read/student",read_student)
 
-// CRUD OPERATION OF STUDENT
+// CRUD OPERATION OF COURSES
 hod_route.post("/add/course",add_courses)
 hod_route.patch("/update/course/:id",update_courses)
-hod_route.delete("/delete/course",delete_courses)
+hod_route.delete("/delete/course/:id",delete_courses)
 hod_route.get("/read/course",read_courses)
 
 // CRUD OPERATION OF CLASS
 
-hod_route.post("/add/class",add_classes)
-hod_route.patch("/update/class",update_classes)
-hod_route.delete("/delete/class",delete_classes)
+hod_route.post("/add/class/:id",add_classes)
+hod_route.patch("/update/class/:id",update_classes)
+hod_route.delete("/delete/class/:id",delete_classes)
 hod_route.get("/read/class",read_classes)
 
 // CRUD OPERATION OF CLASS

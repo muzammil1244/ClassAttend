@@ -9,6 +9,7 @@ import { auth_middleware } from "./middlewares/auth_middlware.js"
 import { teacher_db } from "./db/teacher_db.js"
 import {hod_route} from "./routes/hod_route.js"
 import { courses } from "./db/coures_db.js"
+import { classes_db } from "./db/classes_db.js"
 // calling modules here
 
 let app = express()
@@ -40,6 +41,7 @@ connection_fun()
 hod_db()
 teacher_db()
 courses()
+classes_db()
 
 //  using routes here
 

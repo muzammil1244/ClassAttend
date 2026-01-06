@@ -224,13 +224,13 @@ export const read_student = (res, req) => {
 export const add_courses = async (req, res) => {
     let { course_name } = req.body
     let hod_id = req.user?.id
- if(!hod_id || !course_name){
-console.log(course_name,hod_id)
-return res.status(401).json({
-    message: "all field required for add course"
-})
+    if (!hod_id || !course_name) {
+        console.log(course_name, hod_id)
+        return res.status(401).json({
+            message: "all field required for add course"
+        })
 
- }
+    }
     try {
 
         let sql = `
@@ -251,144 +251,295 @@ return res.status(401).json({
     }
 }
 
-export const update_courses =async (req,res) => {
-    let {course_name} = req.body
-let course_id  = req.params?.id
+export const update_courses = async (req, res) => {
+    let { course_name } = req.body
+    let course_id = req.params?.id
     try {
-       if (!course_id) {
-    return res.status(400).json({
-      message: "course id required"
-    });
-  }
+        if (!course_id) {
+            return res.status(400).json({
+                message: "course id required"
+            });
+        }
 
-  if (!course_name) {
-    return res.status(400).json({
-      message: "course name required"
-    });
-  }
+        if (!course_name) {
+            return res.status(400).json({
+                message: "course name required"
+            });
+        }
 
-        
+
         let sql = `
         UPDATE course_db
         SET name=?
         WHERE id=?
         `
- const [result] = await pool.query(sql, [course_name, course_id]);
+        const [result] = await pool.query(sql, [course_name, course_id]);
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        message: "course not found"
-      });
-    }
-return res.status(200).json({
-    message:"course updated",
-    result
-})
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "course not found"
+            });
+        }
+        return res.status(200).json({
+            message: "course updated",
+            result
+        })
     } catch (error) {
         return res.status(500).json({
-            message:"update error problem from hod "
+            message: "update error problem from hod "
         })
     }
 
 }
-export const delete_courses = (res, req) => {
-    return res.send("hi read courses")
+export const delete_courses =async ( req,res) => {
+
+    let course_id = req.params?.id
+
+    let sql = `
+    DELETE FROM course_db WHERE id = ?
+    `
+
+
+
+    try {
+        
+        if(!course_id){
+            return res.status(401).json({
+                message:"course id not found here for delete "
+            })
+        }
+
+
+      let [result] =   await pool.query(sql,[course_id])
+
+      return res.status(200).json({
+        message:"course deleted ",
+        result
+      })
+
+    } catch (err) {
+        return res.status(500).json({
+            message:"delete course err",
+            err
+        })
+    }
 }
-export const read_courses = (res, req) => {
-    return res.send("hi read courses")
+export const read_courses = async( req,res) => {
+
+let hod_id = req.user?.id
+
+if(!hod_id){
+    return res.json({
+        message:"hod id not found here "
+    })
+}
+
+try{
+
+let sql = `
+SELECT * FROM course_db WHERE hod_id = ?
+`
+
+
+let result = await pool.query(sql,[hod_id])
+    
+return res.status(200).json({
+    message:"hod read course success",
+    data:result[0]
+})
+
+}catch(err){
+
+return res.status(500).json({
+    message:"hod read problem from course"
+})
+
+}
+
 }
 
 
 
 //  CRUDE OPERATION WITH CLASSES
 
-export const add_classes = (res, req) => {
-    return res.send("hi read CLASSES")
+export const add_classes =async (req, res) => {
+
+    let course_id = req.params?.id
+let  {
+    class_name,
+    class_year
+} = req.body
+    
+
+    try {
+
+if(!course_id){
+        return res.status(401).json({
+            message:"course id not found "
+        })
+    }
+let sql = `
+INSERT INTO classes_db(class_name,class_year,course_id) VALUES(?,?,?)
+`
+
+let [result] =  await pool.query(sql,[class_name,class_year,course_id])
+
+return res.status(200).json({
+    message : "data collected",
+    data:result[0]
+})
+        
+    } catch (error) {
+        
+        return res.status(500).json({
+            message:"error from hod add classes",
+            error
+        })
+    }
+
+
 }
-export const update_classes = (res, req) => {
-    return res.send("hi read CLASSES")
+export const update_classes =async (req, res) => {
+
+    let update_course_id = req.params?.id
+let {class_name,class_year} = req.body
+    if(!update_course_id){
+        return res.status(401).json({
+            message:"course update id not found here"
+        })
+    }
+
+
+    try {
+
+let sql = `
+UPDATE  classes_db
+set class_name = ?, class_year=?
+WHERE id=?
+`
+
+let [result] =  await pool.query(sql,[class_name,class_year,update_course_id])
+
+return res.status(200).json({
+    message : "data collected",
+    data:result[0]
+})
+
+        
+    } catch (error) {
+        return res.status(500).json({
+            message:"err from the updata classes",
+            error
+        })
+    }
 }
-export const delete_classes = (res, req) => {
-    return res.send("hi read CLASSES")
+export const delete_classes = async(req, res) => {
+
+    let delete_course_id = req.params?.id
+
+    if(!delete_course_id){
+return res.status(401).json({
+    message:"delete id not found for delete course "
+})
+  }
+
+try {
+
+    let sql = `
+    DELETE FROM classes_db WHERE id=?
+    `
+    
+    let [data] = await pool.query(sql,[delete_course_id])
+    return res.status(200).json({
+        message:"class have deleted ",
+        data:data[0]
+    })
+} catch (error) {
+    return res.status(500).json({
+        message:"err from the delete class",
+        error
+    })
+}
+  
 }
 
-export const read_classes = (res, req) => {
-    return res.send("hi read CLASSES")
+export const read_classes = (req, res) => {
+    return req.send("hi read CLASSES")
 }
 
 
 
 //  CRUDE OPERATION WITH SUBJECT
 
-export const add_subject = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const add_subject = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 
-export const update_subject = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const update_subject = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 
-export const delete_subject = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const delete_subject = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
-export const read_subject = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const read_subject = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 
 
 // ADDITIONAL FEATURE OF HOD
 
-export const add_teacher_to_subject_and_class = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const add_teacher_to_subject_and_class = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 
 
-export const update_teacher_to_subject_and_class = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const update_teacher_to_subject_and_class = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 // showing all attendance of the 
-export const show_all_attendance = (res, req) => {
-    return res.send("hi read SUBJECT")
+export const show_all_attendance = (req, res) => {
+    return req.send("hi read SUBJECT")
 }
 
 // can download any attendance 
 
 export const download_attendance = (req, res) => {
-    return res.send("hi download ")
+    return req.send("hi download ")
 }
 
 
 // Can see particular course attendancely score status
 
 export const see_particular_course = (req, res) => {
-    return res.send("can see particular course score")
+    return req.send("can see particular course score")
 }
 
 // Cane se particular class attendancely score
 
 export const see_particular_class = (req, res) => {
-    return res.send("can see particular class score")
+    return req.send("can see particular class score")
 }
 // Can see particular subject attendancely score status 
 
 export const see_particular_subject = (req, res) => {
-    return res.send("can see particular subject score")
+    return req.send("can see particular subject score")
 }
 // Can see particular student attendancely score status
 
 export const see_particular_student = (req, res) => {
-    return res.send("can see particular subject score")
+    return req.send("can see particular subject score")
 }
 
 // Can see particular student by class name
 
 export const can_see_particular_class_student = (req, res) => {
-    return res.send("can see particular can_see_particular_class_student score")
+    return req.send("can see particular can_see_particular_class_student score")
 }
 
 // can see particular student class score
-export const can_see_particular_class_student_scores = (req, res) => {
-    return res.send("can see particular  can_see_particular_class_student_scores")
+export const can_see_particular_class_student_scoreq = (req, res) => {
+    return req.send("can see particular  can_see_particular_class_student_scores")
 
 }
 
