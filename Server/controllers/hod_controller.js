@@ -291,7 +291,7 @@ export const update_courses = async (req, res) => {
     }
 
 }
-export const delete_courses =async ( req,res) => {
+export const delete_courses = async (req, res) => {
 
     let course_id = req.params?.id
 
@@ -302,59 +302,59 @@ export const delete_courses =async ( req,res) => {
 
 
     try {
-        
-        if(!course_id){
+
+        if (!course_id) {
             return res.status(401).json({
-                message:"course id not found here for delete "
+                message: "course id not found here for delete "
             })
         }
 
 
-      let [result] =   await pool.query(sql,[course_id])
+        let [result] = await pool.query(sql, [course_id])
 
-      return res.status(200).json({
-        message:"course deleted ",
-        result
-      })
+        return res.status(200).json({
+            message: "course deleted ",
+            result
+        })
 
     } catch (err) {
         return res.status(500).json({
-            message:"delete course err",
+            message: "delete course err",
             err
         })
     }
 }
-export const read_courses = async( req,res) => {
+export const read_courses = async (req, res) => {
 
-let hod_id = req.user?.id
+    let hod_id = req.user?.id
 
-if(!hod_id){
-    return res.json({
-        message:"hod id not found here "
-    })
-}
+    if (!hod_id) {
+        return res.json({
+            message: "hod id not found here "
+        })
+    }
 
-try{
+    try {
 
-let sql = `
+        let sql = `
 SELECT * FROM course_db WHERE hod_id = ?
 `
 
 
-let result = await pool.query(sql,[hod_id])
-    
-return res.status(200).json({
-    message:"hod read course success",
-    data:result[0]
-})
+        let result = await pool.query(sql, [hod_id])
 
-}catch(err){
+        return res.status(200).json({
+            message: "hod read course success",
+            data: result[0]
+        })
 
-return res.status(500).json({
-    message:"hod read problem from course"
-})
+    } catch (err) {
 
-}
+        return res.status(500).json({
+            message: "hod read problem from course"
+        })
+
+    }
 
 }
 
@@ -362,140 +362,309 @@ return res.status(500).json({
 
 //  CRUDE OPERATION WITH CLASSES
 
-export const add_classes =async (req, res) => {
+export const add_classes = async (req, res) => {
 
     let course_id = req.params?.id
-let  {
-    class_name,
-    class_year
-} = req.body
-    
+    let {
+        class_name,
+        class_year
+    } = req.body
+
 
     try {
 
-if(!course_id){
-        return res.status(401).json({
-            message:"course id not found "
-        })
-    }
-let sql = `
+        if (!course_id) {
+            return res.status(401).json({
+                message: "course id not found "
+            })
+        }
+        let sql = `
 INSERT INTO classes_db(class_name,class_year,course_id) VALUES(?,?,?)
 `
 
-let [result] =  await pool.query(sql,[class_name,class_year,course_id])
+        let [result] = await pool.query(sql, [class_name, class_year, course_id])
 
-return res.status(200).json({
-    message : "data collected",
-    data:result[0]
-})
-        
+        return res.status(200).json({
+            message: "data collected",
+            data: result[0]
+        })
+
     } catch (error) {
-        
+
         return res.status(500).json({
-            message:"error from hod add classes",
+            message: "error from hod add classes",
             error
         })
     }
 
 
 }
-export const update_classes =async (req, res) => {
+export const update_classes = async (req, res) => {
 
     let update_course_id = req.params?.id
-let {class_name,class_year} = req.body
-    if(!update_course_id){
+    let { class_name, class_year } = req.body
+    if (!update_course_id) {
         return res.status(401).json({
-            message:"course update id not found here"
+            message: "course update id not found here"
         })
     }
 
 
     try {
 
-let sql = `
+        let sql = `
 UPDATE  classes_db
 set class_name = ?, class_year=?
 WHERE id=?
 `
 
-let [result] =  await pool.query(sql,[class_name,class_year,update_course_id])
+        let [result] = await pool.query(sql, [class_name, class_year, update_course_id])
 
-return res.status(200).json({
-    message : "data collected",
-    data:result[0]
-})
+        return res.status(200).json({
+            message: "data collected",
+            data: result[0]
+        })
 
-        
+
     } catch (error) {
         return res.status(500).json({
-            message:"err from the updata classes",
+            message: "err from the updata classes",
             error
         })
     }
 }
-export const delete_classes = async(req, res) => {
+export const delete_classes = async (req, res) => {
 
     let delete_course_id = req.params?.id
 
-    if(!delete_course_id){
-return res.status(401).json({
-    message:"delete id not found for delete course "
-})
-  }
+    if (!delete_course_id) {
+        return res.status(401).json({
+            message: "delete id not found for delete course "
+        })
+    }
 
-try {
+    try {
 
-    let sql = `
+        let sql = `
     DELETE FROM classes_db WHERE id=?
     `
-    
-    let [data] = await pool.query(sql,[delete_course_id])
-    return res.status(200).json({
-        message:"class have deleted ",
-        data:data[0]
-    })
-} catch (error) {
-    return res.status(500).json({
-        message:"err from the delete class",
-        error
-    })
-}
-  
+
+        let [data] = await pool.query(sql, [delete_course_id])
+        return res.status(200).json({
+            message: "class have deleted ",
+            data: data[0]
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "err from the delete class",
+            error
+        })
+    }
+
 }
 
-export const read_classes = (req, res) => {
-    return req.send("hi read CLASSES")
+export const read_classes = async (req, res) => {
+
+    let hod_id = req.user?.id
+
+    try {
+        if (!hod_id) {
+            return res.status(401).json({
+                message: "hod id not found"
+            })
+        }
+
+        let sql = `
+SELECT cl.* 
+FROM classes_db as cl
+JOIN course_db c 
+ON cl.course_id = c.id
+WHERE c.hod_id = ?
+
+`
+
+        let [result] = await pool.query(sql, [hod_id])
+
+        return res.status(200).json({
+            message: "class read success",
+            data: result
+        })
+
+
+
+    } catch (error) {
+        return res.status(500).json({
+            message: " read classes problme her ",
+            error
+        })
+    }
+
+
+
+
+
+
 }
 
 
 
 //  CRUDE OPERATION WITH SUBJECT
 
-export const add_subject = (req, res) => {
-    return req.send("hi read SUBJECT")
+export const add_subject = async (req, res) => {
+    let hod_id = req.user?.id
+    let { sub_name } = req.body
+    try {
+
+        if (!sub_name || !hod_id) {
+            return res.status(401).json({
+                message: "all filed require"
+            })
+        }
+
+
+        let sql = `
+INSERT INTO subject_db(subject,hod_id) VALUES(?,?)
+`
+        let [data] = await pool.query(sql, [sub_name,hod_id])
+
+        return res.status(200).json({
+            message: "subject added successfully",
+            data: data
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "err from add subject",
+            error
+
+        })
+    }
+
+
 }
 
-export const update_subject = (req, res) => {
-    return req.send("hi read SUBJECT")
-}
 
-export const delete_subject = (req, res) => {
-    return req.send("hi read SUBJECT")
+
+export const delete_subject =async (req, res) => {
+
+    let hod_id = req.user?.id
+    let subject_id = req.params?.id
+
+    try {
+
+        let sql = `
+        DELETE FROM  subject_db 
+        WHERE hod_id = ? AND id = ?
+        `
+
+        let [data] = await pool.sql(sql,[hod_id,subject_id])
+
+        return res.status(200).json({
+            message:"subject delete successfully",
+            data
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message:"delete subject id err ",
+            error
+        })
+    }
+
 }
-export const read_subject = (req, res) => {
-    return req.send("hi read SUBJECT")
+export const read_subject =async (req, res) => {
+
+    let hod_id = req.user?.id
+    if(!hod_id){
+        return res.status(401).json({
+            message:"hod id not founded here for the read"
+        })
+    }
+
+    try {
+        
+        let sql = `
+        SELECT * FROM subject_db 
+        WHERE hod_id = ?
+        `
+
+        let [data] = await pool.query(sql,[hod_id])
+
+        return res.status(200).json({
+            message:"subjects read successfully ",
+            data:data
+        })
+
+
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message:"read err subject",
+            error
+        })
+        
+    }
+
+
 }
 
 
 // ADDITIONAL FEATURE OF HOD
 
-export const add_teacher_to_subject_and_class = (req, res) => {
-    return req.send("hi read SUBJECT")
+export const add_teacher_to_subject_and_class =async (req, res) => {
+
+    let { classes , subject ,teacher } =  req.body
+
+    let sql = `
+    INSERT INTO class_subject_db(class_id,subject_id,teacher_id) VALUES(?,?,?)
+    `
+try {
+
+    let [data] = await pool.query(sql,[classes,subject,teacher])
+    
+    return res.status(200).json({
+        message:" add teacher classes and subjects successfully",
+        data:data
+    })
+} catch (error) {
+    return res.status(500).json({
+        message:"add class ans subject to teacher errr",
+        error
+    })
+}
 }
 
 
-export const update_teacher_to_subject_and_class = (req, res) => {
-    return req.send("hi read SUBJECT")
+export const update_teacher_to_subject_and_class =async (req, res) => {
+
+    let c_s_id = req.params?.id
+     let { classes , subject ,teacher } =  req.body
+     if(!classes ||  !subject || !teacher ){
+
+        return res.status(401).json({
+            message:"all field required",
+        })
+     }
+    try {
+
+        let sql = `
+        UPDATE class_subject_db
+        SET class_id = ? , subject_id=? ,  teacher_id=?
+        WHERE id=?
+        `
+        let [data] = await pool.query(sql,[classes , subject ,teacher,c_s_id])
+
+        return res.status(200).json({
+            message:"update subject class teacher successfully",
+            data:data
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message:" updata classes subject id error",
+            error
+        })
+    }
+
 }
 // showing all attendance of the 
 export const show_all_attendance = (req, res) => {
