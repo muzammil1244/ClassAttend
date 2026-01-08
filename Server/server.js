@@ -10,8 +10,9 @@ import { teacher_db } from "./db/teacher_db.js"
 import {hod_route} from "./routes/hod_route.js"
 import { courses } from "./db/coures_db.js"
 import { classes_db } from "./db/classes_db.js"
-import { subject_db } from "./db/subject_db.js"
 import { class_subject_db } from "./db/class_subject_db.js"
+import { student_db } from "./db/student_db.js"
+import { subject_db } from "./db/subject_db.js"
 // calling modules here
 
 let app = express()
@@ -44,8 +45,9 @@ hod_db()
 teacher_db()
 courses()
 classes_db()
-subject_db()
 class_subject_db()
+student_db()
+subject_db()
 //  using routes here
 
 app.use("/auth",auth_route)
