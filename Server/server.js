@@ -13,6 +13,8 @@ import { classes_db } from "./db/classes_db.js"
 import { class_subject_db } from "./db/class_subject_db.js"
 import { student_db } from "./db/student_db.js"
 import { subject_db } from "./db/subject_db.js"
+import { teacher_route } from "./routes/teacher_route.js"
+import { att_db } from "./db/att_db.js"
 // calling modules here
 
 let app = express()
@@ -48,10 +50,12 @@ classes_db()
 class_subject_db()
 student_db()
 subject_db()
+att_db()
 //  using routes here
 
 app.use("/auth",auth_route)
 app.use("/hod",auth_middleware,hod_route)
+app.use("/teacher",auth_middleware,teacher_route)
 app.get("/",auth_middleware,(req,res)=>{
     return res.send("server is stared")
 })
