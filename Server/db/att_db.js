@@ -1,4 +1,4 @@
-import  pool from  "../connections/db_connent.js"
+import pool from "../connections/db_connent.js"
 
 
 let sql = `
@@ -9,16 +9,18 @@ class_id INT ,
 subject_id INT,
 teacher_id INT,
 att_date DATE,
-status ENUM('P','A')
+status ENUM('P','A'),
+UNIQUE (student_id, subject_id, att_date)
+
 
 )
 `
 
-export const att_db=async()=>{
+export const att_db = async () => {
     try {
         await pool.query(sql)
         console.log("att data created successfully ")
     } catch (error) {
-        return console.log("att db data error for connection problem "+error)
+        return console.log("att db data error for connection problem " + error)
     }
 }
