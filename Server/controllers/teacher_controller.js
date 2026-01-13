@@ -3,20 +3,49 @@ import { json } from "express"
 import pool from "../connections/db_connent.js"
 // CRUD OPERATION OF WITH STUDENT
 
-export const add_student = (req, res) => {
-    return res.send("add student ")
-}
+// export const add_student = (req, res) => {
+//     return res.send("add student ")
+// }
 
-export const update_student = (req, res) => {
-    return res.send("update student ")
-}
+// export const update_student = (req, res) => {
+//     return res.send("update student ")
+// }
 
-export const delete_student = (req, res) => {
-    return res.send("delete student ")
-}
+// export const delete_student = (req, res) => {
+//     return res.send("delete student ")
+// }
 
-export const read_student = (req, res) => {
-    return res.send("read student ")
+export const read_student =async (req, res) => {
+    let class_id = req.params?.class
+  
+
+    if( !class_id ){
+        return res.status(401).json({
+            message:"all field required "
+        })
+    }
+
+    try {
+
+        let sql = `
+        SELECT * FROM student_db
+        WHERE class_id = ?
+        `
+        
+        let [result] = await pool.query(sql,[class_id])
+        return res.status(200).json({
+            message:"read student successfully",
+            result
+
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message:"error from read student for teacher",
+            error
+        })
+    }
+
+
 }
 
 // ATTENDANCE MANAGEMENT
@@ -168,6 +197,11 @@ export const see_particular_subject_score = async (req, res) => {
         let subject_id = req.params?.sub
         let class_id = req.params?.class
 
+        if(!subject_id || !class_id){
+            return res.status(401).json({
+                message:"all filed  required"
+            })
+        }
         let sql = `
         SELECT 
 COUNT(DISTINCT s.id) AS total_students,
@@ -177,10 +211,13 @@ SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS total_presents,
   SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) /
   (COUNT(DISTINCT s.id) * COUNT(DISTINCT a.att_date))
 ) * 100 AS presenty_percentage
+
 FROM student_db s
 JOIN att_db a ON s.id = a.student_id
 WHERE s.class_id = ?
 AND a.subject_id = ?;
+
+        
 
         `
 
