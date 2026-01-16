@@ -1,6 +1,7 @@
 
 import { json } from "express"
 import pool from "../connections/db_connent.js"
+import { AsyncParser } from "@json2csv/node";
 // CRUD OPERATION OF WITH STUDENT
 
 // export const add_student = (req, res) => {
@@ -15,13 +16,13 @@ import pool from "../connections/db_connent.js"
 //     return res.send("delete student ")
 // }
 
-export const read_student =async (req, res) => {
+export const read_student = async (req, res) => {
     let class_id = req.params?.class
-  
 
-    if( !class_id ){
+
+    if (!class_id) {
         return res.status(401).json({
-            message:"all field required "
+            message: "all field required "
         })
     }
 
@@ -31,16 +32,16 @@ export const read_student =async (req, res) => {
         SELECT * FROM student_db
         WHERE class_id = ?
         `
-        
-        let [result] = await pool.query(sql,[class_id])
+
+        let [result] = await pool.query(sql, [class_id])
         return res.status(200).json({
-            message:"read student successfully",
+            message: "read student successfully",
             result
 
         })
     } catch (error) {
         return res.status(500).json({
-            message:"error from read student for teacher",
+            message: "error from read student for teacher",
             error
         })
     }
@@ -197,9 +198,9 @@ export const see_particular_subject_score = async (req, res) => {
         let subject_id = req.params?.sub
         let class_id = req.params?.class
 
-        if(!subject_id || !class_id){
+        if (!subject_id || !class_id) {
             return res.status(401).json({
-                message:"all filed  required"
+                message: "all filed  required"
             })
         }
         let sql = `
@@ -221,10 +222,10 @@ AND a.subject_id = ?;
 
         `
 
-        let data = await pool.query(sql,[class_id,subject_id])
+        let data = await pool.query(sql, [class_id, subject_id])
 
         return res.status(200).json({
-            message:"data collected successfully",
+            message: "data collected successfully",
             data
         })
 
@@ -236,19 +237,106 @@ AND a.subject_id = ?;
     }
 }
 
+
+
 export const download_student_attendance = (req, res) => {
-    return res.send("read student ")
+
 }
 
-export const update_attendance = (req, res) => {
-    return res.send("read student ")
+
+
+export const read_all_attendance = async (req, res) => {
+    let class_id = req.params?.class
+    let subject_id = req.params?.sub
+    if (!class_id || !subject_id) {
+        return res.status(401).json({
+            message: "all field required for the read all attendance"
+        })
+    }
+    try {
+
+        let sql = `
+SELECT
+  a.att_date,
+  COUNT(*) AS total,
+  SUM(a.status = 'P') AS present,
+  SUM(a.status = 'A') AS absent
+FROM att_db a
+WHERE a.subject_id = ?
+  AND a.class_id = ?
+GROUP BY a.att_date
+ORDER BY a.att_date DESC;
+
+`
+        let [result] = await pool.query(sql, [subject_id, class_id])
+        return res.status(200).json({
+            message: "data collect successfully",
+            result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "error from read all attendance",
+            error
+        })
+    }
 }
 
-export const read_all_attendance = (req, res) => {
-    return res.send("read student ")
-}
 
-export const read_particular_attendance = (req, res) => {
-    return res.send("read student ")
-}
+export const read_particular_attendance = async (req, res) => {
+  let class_id = req.params?.class;
+  let subject_id = req.params?.sub;
+  let date = req.params?.date;
+
+  let download = req.query?.download; // ?download=true
+
+  if (!class_id || !subject_id || !date) {
+    return res.status(401).json({
+      message: "all field required",
+    });
+  }
+
+  try {
+    let sql = `
+      SELECT s.roll_no, s.name, a.status, a.att_date
+      FROM att_db a
+      JOIN student_db s ON s.id = a.student_id
+      WHERE a.att_date = ? AND a.class_id = ? AND a.subject_id = ?
+      ORDER BY s.roll_no
+    `;
+
+    let [result] = await pool.query(sql, [date, class_id, subject_id]);
+
+    // ✅ DOWNLOAD MODE (CSV)
+    if (download === "true") {
+      const fields = ["roll_no", "name", "status", "att_date"];
+
+      const opts = { fields };
+      const asyncParser = new AsyncParser(opts);
+
+      // json → csv
+      const csv = await asyncParser.parse(result).promise();
+
+      // 🔥 download headers
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="attendance_${date}.csv"`
+      );
+
+      return res.status(200).send(csv);
+    }
+
+    // ✅ NORMAL JSON MODE
+    return res.status(200).json({
+      message: "data collect successfully",
+      result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "err from the read particular att",
+      error,
+    });
+  }
+};
+
 

@@ -12,7 +12,6 @@ att_date DATE,
 status ENUM('P','A'),
 UNIQUE (student_id, subject_id, att_date)
 
-
 )
 `
 

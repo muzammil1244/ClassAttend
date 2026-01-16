@@ -15,9 +15,12 @@ import { student_db } from "./db/student_db.js"
 import { subject_db } from "./db/subject_db.js"
 import { teacher_route } from "./routes/teacher_route.js"
 import { att_db } from "./db/att_db.js"
+import cors from "cors";
+
 // calling modules here
 
 let app = express()
+app.use(cors()); // default sab allow
 
 // middleware 
 
