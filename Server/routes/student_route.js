@@ -1,8 +1,8 @@
 import express from "express"
-import { attendance_record, over_score, subjects_score } from "../controllers/student_controller"
+import { all_over_score, attendance_record, subjects_score } from "../controllers/student_controller.js"
 
-student_route = express.Router()
+export const student_route = express.Router()
 
-student_route.get("/all/score",over_score)
+student_route.get("/all/score",all_over_score)
 student_route.get("/subject/score",subjects_score)
 student_route.get("/attendance/data",attendance_record)

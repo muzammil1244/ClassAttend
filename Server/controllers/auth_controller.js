@@ -8,13 +8,15 @@ dotenv.config()
 
 export const login = async (req, res) => {
 
-    let { email, password, role } = req.body
-    if (!email || !password || !role) {
-        return res.json({ message: "all field required" })
+    let { email, password, role, student } = req.body
+    if ( !role) {
+        return res.json({ message: "role field required" })
     }
 
     if (role == "hod") {
-
+ if (!email || !password || !role) {
+        return res.json({ message: "all field required" })
+    }
         try {
             let sql = `SELECT * from hod_db WHERE email = ?`
 
@@ -72,7 +74,9 @@ export const login = async (req, res) => {
 
 
     }if(role == "teacher"){
-
+if (!email || !password || !role) {
+        return res.json({ message: "all field required" })
+    }
 
   try {
             let sql = `SELECT * from teacher_db WHERE email = ?`
@@ -128,12 +132,58 @@ export const login = async (req, res) => {
 
 
 
+    }if(role == "student"){
+
+try {
+if(!student.roll_no ||  !student.name || !student.class_id){
+    return res.status(401).json({
+        message:"all field required for  student  data "
+    })
+}
+
+let sql = `
+SELECT * from student_db
+WHERE name = ? AND class_id = ? AND roll_no = ?
+`
+
+let [result] = await pool.query(sql,[student.name,student.class_id,student.roll_no])
+
+if(result.length == 0){
+    return res.status(401).json({
+        message:"student not found ",
+        result
+    })
+}
+
+  let payload = {
+                id: result[0].id,
+                name: result[0].name,
+                 roll_no: result[0].roll_no,
+                 class_id:result[0].class_id
+            }
+
+            let token = await jwt.sign(payload,process.env.JWT_key,{expiresIn:"1h"})
+
+            if(!token){
+                return res.status(500).json({
+                    message:"token is not generated"
+                })
+            }
+ return res.status(200).json({
+                message: "now student is logged",
+                token: token
+            })
+    
+} catch (error) {
+    return res.status(500).json({
+        message:"error from login to student",
+    error
+        
+    })
+}
+
+
     }
-
-
-
-
-
 
 
 

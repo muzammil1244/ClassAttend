@@ -16,6 +16,7 @@ import { subject_db } from "./db/subject_db.js"
 import { teacher_route } from "./routes/teacher_route.js"
 import { att_db } from "./db/att_db.js"
 import cors from "cors";
+import { student_route } from "./routes/student_route.js"
 
 // calling modules here
 
@@ -54,11 +55,14 @@ class_subject_db()
 student_db()
 subject_db()
 att_db()
+
+
 //  using routes here
 
 app.use("/auth",auth_route)
 app.use("/hod",auth_middleware,hod_route)
 app.use("/teacher",auth_middleware,teacher_route)
+app.use("/student",auth_middleware,student_route)
 app.get("/",auth_middleware,(req,res)=>{
     return res.send("server is stared")
 })
