@@ -45,23 +45,112 @@ return res.status(200).json({
     
 }
 
-export const subjects_score = (req,res)=>{
+export const subjects_score =async (req, res) => {
+
+    let student_id = req.user?.id
+
+    if (!student_id) {
+        return res.status(401).json({
+            message: "student not found"
+        })
+    }
 
     try {
 
         let sql = `
-        SELECT * FROM att_db
-        WHERE 
-
+        SELECT 
+            s.id AS subject_id,
+            s.subject AS subject_name,
+            COUNT(a.id) AS total_lectures,
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_count,
+            ROUND(
+                (SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) / COUNT(a.id)) * 100,
+                2
+            ) AS percentage
+        FROM att_db a
+        JOIN subject_db s ON s.id = a.subject_id
+        WHERE a.student_id = ?
+        GROUP BY a.subject_id
         `
-        
+
+  let [result] =    await  pool.query(sql, [student_id])
+
+            return res.status(200).json({
+                message: "subject wise attendance",
+                data: result
+            })
+       
+
     } catch (error) {
         return res.status(500).json({
-            message:"  error  from  subject  "
+            message: "server error",
+            error
         })
     }
 }
+
 // kab aya or kab nahi bay attendance and teacher ne kin kin din attendance li wo 
-export const attendance_record=(req,res)=>{
-    return res.send("hi hello ")
+export const attendance_record=async(req,res)=>{
+ 
+    let student_id = req.user?.id
+
+    if(!student_id){
+        return res.status(401).json({
+            message:"student id not found here "
+        })
+    }
+
+    try {
+
+        let sql = `
+        
+        SELECT  
+*
+        FROM att_db 
+        WHERE student_id = ?
+        ORDER BY att_date
+
+
+        `
+
+        let [result] = await pool.query(sql,[student_id])
+        
+ return res.status(200).json({
+    message:"data collected  successfully",
+    result
+ })
+
+    } catch (error) {
+        return res.status(500).json({
+            message:"error from reading att by student",
+            error
+        })
+    }
+
+}
+
+export const student_profile = async(req,res)=>{
+
+    let student_id = req.user?.id
+    try {
+
+        let sql = `
+        Select *
+        FROM student_db
+        WHERE id = ?
+        `
+
+        let [result] = await pool.query(sql,[student_id])
+        
+        return res.status(200).json({
+            message:"profile data collected successfully",
+            result
+        })
+        
+    } catch (error) {
+        return res.status(500).json({
+            message:"error from student profile",
+            error
+        })
+    }
 }
