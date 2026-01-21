@@ -4,6 +4,7 @@ import {
         add_teacher_to_subject_and_class, delete_classes, delete_courses, delete_student,
         delete_subject, delete_teacher, download_attendance, read_classes, read_courses,
         read_student, read_subject, read_teacher, see_particular_class, see_particular_course,
+        see_particular_day_att,
         see_particular_student, see_particular_subject, show_all_attendance,
         update_classes, update_courses, update_student, update_teacher, update_teacher_to_subject_and_class
 } from "../controllers/hod_controller.js"
@@ -47,8 +48,9 @@ hod_route.get("/read/subject", read_subject)
 
 hod_route.post("/add/teacher/subject", add_teacher_to_subject_and_class)
 hod_route.patch("/update/teacher/subject/:id", update_teacher_to_subject_and_class)
-hod_route.get("read/all/attendance", show_all_attendance)
+hod_route.get("/read/all/attendance/:class/:sub", show_all_attendance)
+hod_route.get("/read/particular/attendance/:date/:sub", see_particular_day_att)
 hod_route.get("/download/attendance", download_attendance)
-hod_route.get("/course/score", see_particular_course)
-hod_route.get("/class/score", see_particular_class)
+hod_route.get("/course/score/:course/:date", see_particular_course)
+hod_route.get("/class/score/:class/:course/:date", see_particular_class)
 hod_route.get("/student/score", see_particular_student)

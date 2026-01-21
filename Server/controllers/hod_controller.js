@@ -1,4 +1,5 @@
 
+import { rectSortingStrategy } from "@dnd-kit/sortable"
 import pool from "../connections/db_connent.js"
 import bcrypt from "bcrypt"
 
@@ -238,7 +239,7 @@ export const add_student = async (req, res) => {
         })
     }
 }
-export const update_student =async (req, res) => {
+export const update_student = async (req, res) => {
     let student_id = req.params?.id
     let {
         name,
@@ -264,13 +265,13 @@ export const update_student =async (req, res) => {
     WHERE id = ?
 
     `
- 
-    let [result] = await pool.query(sql,[name,roll_no,class_id , student_id])
 
-return res.status(401).json({
-    message:"student updated successfully",
-    data:result
-})
+        let [result] = await pool.query(sql, [name, roll_no, class_id, student_id])
+
+        return res.status(401).json({
+            message: "student updated successfully",
+            data: result
+        })
 
     } catch (error) {
 
@@ -286,42 +287,42 @@ return res.status(401).json({
 
 }
 
-export const delete_student =async (req, res) => {
+export const delete_student = async (req, res) => {
 
-    let student_id  =  req.params?.id
+    let student_id = req.params?.id
 
-    let  sql = `
+    let sql = `
     DELETE FROM student_db
     WHERE id = ?
     `
     try {
-        
-        let result = await pool.query(sql,[student_id])
-        
+
+        let result = await pool.query(sql, [student_id])
+
         return res.status(200).json({
-            message:"student delete successfully",
+            message: "student delete successfully",
             result
         })
     } catch (error) {
-       return res.status(500).json({
-        message:"student delete error"
-       }) 
+        return res.status(500).json({
+            message: "student delete error"
+        })
     }
 }
 
 export const read_student = async (req, res) => {
 
-  let hod_id = req.user?.id;
+    let hod_id = req.user?.id;
 
-  if (!hod_id) {
-    return res.status(401).json({
-      message: "HOD id not found"
-    });
-  }
+    if (!hod_id) {
+        return res.status(401).json({
+            message: "HOD id not found"
+        });
+    }
 
-  try {
+    try {
 
-    let sql = `
+        let sql = `
       SELECT s.* 
       FROM student_db s
       JOIN classes_db c ON s.class_id = c.id
@@ -329,19 +330,19 @@ export const read_student = async (req, res) => {
       WHERE co.hod_id = ?
     `;
 
-    let [result] = await pool.query(sql, [hod_id]);
+        let [result] = await pool.query(sql, [hod_id]);
 
-    return res.status(200).json({
-      message: "read student successfully",
-      data: result
-    });
+        return res.status(200).json({
+            message: "read student successfully",
+            data: result
+        });
 
-  } catch (error) {
-    return res.status(500).json({
-      message: "read error for read student",
-      error
-    });
-  }
+    } catch (error) {
+        return res.status(500).json({
+            message: "read error for read student",
+            error
+        });
+    }
 };
 
 
@@ -796,27 +797,210 @@ export const update_teacher_to_subject_and_class = async (req, res) => {
 
 }
 // showing all attendance of the 
-export const show_all_attendance = (req, res) => {
-    return req.send("hi read SUBJECT")
+export const show_all_attendance = async (req, res) => {
+    let hod_id = req.user?.id
+    let class_id = req.params?.class
+    let subject_id = req.params?.sub
+
+    if (!hod_id || !class_id || !subject_id) {
+        return res.status(401).json({
+            message: "hod id not found here "
+        })
+    }
+
+    try {
+
+        let sql = `
+    SELECT
+    att_date AS DATE,
+    COUNT(*) AS total_student,
+    SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) AS present_student
+    FROM att_db 
+WHERE class_id  = ? AND subject_id = ?
+GROUP BY att_date
+    
+
+    `
+        let [result] = await pool.query(sql, [class_id, subject_id])
+
+        return res.status(200).json({
+            message: "data collect successfully",
+            data: result
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "error from hod show all attendance",
+            error
+        })
+    }
+
+}
+
+export const see_particular_day_att = async (req, res) => {
+
+    let date = req.params?.date
+    let subject_id = req.params?.sub
+    let class_id = req.params?.class
+
+    if (!date || !subject_id || !class_id) {
+        return res.status(401).json({
+            message: "all field is required "
+        })
+    }
+
+    try {
+
+        let sql = `
+        SELECT
+        s.roll_no , s.name , a.status , a.att_date
+
+        FROM att_db a 
+        JOIN student_db s ON s.id = a.student_id
+        WHERE subject_id = ? AND att_date = ? AND class_id = ?
+        ORDER BY s.roll_no
+        `
+
+        let [result] = await pool.query(sql, [subject_id, date, class_id])
+
+        return res.status(200).json({
+            message: "all data collect successfully",
+            result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "err from reading date attend",
+            error
+        })
+    }
 }
 
 // can download any attendance 
 
-export const download_attendance = (req, res) => {
-    return req.send("hi download ")
+export const download_attendance = async (req, res) => {
+
+    let date = req.params?.date
+    let subject_id = req.params?.sub
+    let class_id = req.params?.class
+    if (!date || !subject_id || !class_id) {
+        return res.stat(401).json({
+            message: "all field is required "
+        })
+    }
+
+    try {
+
+        let sql = `
+        SELECT
+        s.roll_no , s.name , a.status , a.att_date
+
+        FROM att_db a 
+        JOIN student_db s ON s.id = a.student_id
+        WHERE subject_id = ? AND att_date = ? AND class_id = ?
+        ORDER BY s.roll_no
+        `
+
+        let [result] = await pool.query(sql, [subject_id, date, class_id])
+
+        return res.status(200).json({
+            message: "all data collect successfully",
+            result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "err from reading date attend",
+            error
+        })
+    }
 }
 
 
 // Can see particular course attendancely score status
 
-export const see_particular_course = (req, res) => {
-    return req.send("can see particular course score")
+export const see_particular_course = async (req, res) => {
+
+    let course_id = req.params?.course
+    let date = req.params?.date
+
+    if (!course_id || !date) {
+        return res.status(401).json({
+            message: "all field required"
+        })
+    }
+
+    try {
+
+        let sql = `
+
+SELECT 
+
+COUNT(*) AS total_student,
+SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) AS present_student,
+ROUND(
+SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) / COUNT(*)  * 100
+) AS percentage
+FROM att_db a
+JOIN class_subject_db cs ON cs.id = a.class_id
+JOIN classes_db c ON c.id = cs.class_id
+WHERE c.course_id = ? AND a.att_date = ?
+
+
+`
+
+        let [result] = await pool.query(sql, [course_id, date])
+
+        return res.status(200).json({
+            message: "data collected successfully",
+            result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "err from the see particular crouse  score  ",
+            error
+        })
+    }
+
 }
 
 // Cane se particular class attendancely score
 
-export const see_particular_class = (req, res) => {
-    return req.send("can see particular class score")
+export const see_particular_class = async (req, res) => {
+
+    let course_id = req.params?.course
+    let class_id = req.params?.class
+    let date = req.params?.date
+    try {
+
+        let sql = `
+        SELECT
+        COUNT(*) AS total_student,
+        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_student,
+ROUND(
+SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
+) AS percentage
+    FROM att_db a
+        JOIN class_subject_db cs ON cs.id = a.class_id
+        JOIN classes_db c ON c.id = cs.class_id
+        JOIN course_db cr ON cr.id = c.course_id
+        WHERE cr.id = ? AND c.id = ? AND a.att_date = ?
+       
+        `
+
+        let [result] = await pool.query(sql, [course_id, class_id, date])
+
+        return res.status(200).json({
+            message: "data collected successfully",
+            result
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "error from see particular class  scores",
+            error
+        })
+    }
+
+
 }
 // Can see particular subject attendancely score status 
 
