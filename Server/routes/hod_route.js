@@ -1,7 +1,7 @@
 import express from "express"
 import {
         add_classes, add_courses, add_student, add_subject, add_teacher,
-        add_teacher_to_subject_and_class, delete_classes, delete_courses, delete_student,
+        add_teacher_to_subject_and_class, can_see_particular_class_student, delete_classes, delete_courses, delete_student,
         delete_subject, delete_teacher, download_attendance, read_classes, read_courses,
         read_student, read_subject, read_teacher, see_particular_class, see_particular_course,
         see_particular_day_att,
@@ -53,4 +53,6 @@ hod_route.get("/read/particular/attendance/:date/:sub", see_particular_day_att)
 hod_route.get("/download/attendance", download_attendance)
 hod_route.get("/course/score/:course/:date", see_particular_course)
 hod_route.get("/class/score/:class/:course/:date", see_particular_class)
-hod_route.get("/student/score", see_particular_student)
+hod_route.get("/subject/score/:class/:course/:date/:sub", see_particular_subject)
+hod_route.get("/score/subject/:student",can_see_particular_class_student)
+hod_route.get("/student/score/:student/:roll_no", see_particular_student)

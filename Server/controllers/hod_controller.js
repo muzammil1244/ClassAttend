@@ -1004,19 +1004,117 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 }
 // Can see particular subject attendancely score status 
 
-export const see_particular_subject = (req, res) => {
-    return req.send("can see particular subject score")
+export const see_particular_subject = async (req, res) => {
+    let course_id = req.params?.course
+    let class_id = req.params?.class
+    let date = req.params?.date
+    let subject_id = req.params?.sub
+    try {
+
+        let sql = `
+        SELECT
+        COUNT(*) AS total_student,
+        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_student,
+ROUND(
+SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
+) AS percentage
+    FROM att_db a
+        JOIN class_subject_db cs ON cs.id = a.class_id
+        JOIN classes_db c ON c.id = cs.class_id
+        JOIN course_db cr ON cr.id = c.course_id
+        WHERE cr.id = ? AND c.id = ? AND a.att_date = ? AND a.subject_id = ? 
+       
+        `
+
+        let [result] = await pool.query(sql, [course_id, class_id, date, subject_id])
+
+        return res.status(200).json({
+            message: "data collected successfully",
+            result
+        })
+
+    } catch (err) {
+        return res.status(500).json({
+            message: "error from reading subject wise score ",
+            err
+        })
+    }
 }
 // Can see particular student attendancely score status
 
-export const see_particular_student = (req, res) => {
-    return req.send("can see particular subject score")
+export const see_particular_student = async (req, res) => {
+    let student_id = req.params?.student
+    let roll_no = req.params?.roll_no
+
+    try {
+
+
+        let sql = `
+        SELECT COUNT(*) AS total_att,
+        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_class,
+        ROUND(
+SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100 
+              ) AS percentage
+    
+        FROM att_db a
+        JOIN student_db s ON s.id=a.student_id
+        JOIN class
+    WHERE a.student_id = ? AND s.roll_no = ?
+
+        `
+
+
+        let [result] = await pool.query(sql,[student_id,roll_no])
+
+        return res.status(200).json({
+            message:"data collect successfully",
+            result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "error from reading particular  student ",
+            error
+        })
+    }
+
 }
 
 // Can see particular student by class name
 
-export const can_see_particular_class_student = (req, res) => {
-    return req.send("can see particular can_see_particular_class_student score")
+export const can_see_particular_class_student = async (req,res) => {
+
+    let student_id = req.params?.student
+    
+    if(!student_id){
+        return res.status(401).json({
+            message:"data not found here all field required "
+        })
+    }
+
+ try {
+
+    let sql = `
+   SELECT a.id
+   FROM att_db a
+   WHERE a.student_id = ?
+    `
+    
+let [result] = await pool.query(sql,[student_id])
+
+return res.status.json({
+    message:"data collected successfully",
+ result
+})
+
+
+ }catch (error) {
+    
+    return res.status(500).json({
+        message:"err from reading score of  student base on subjects ",
+        error
+    })
+ }
+
 }
 
 // can see particular student class score
