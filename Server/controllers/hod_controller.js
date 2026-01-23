@@ -9,6 +9,46 @@ import bcrypt from "bcrypt"
 
 // CRUD  OPERATION WITH TEACHERS
 
+export const profile=async()=>{
+    let hod_id = req.user?.id
+
+    if(!hod_id){
+        return res.status(401).json({
+            message:"hod id not found here "
+        })
+    }
+
+try {
+
+    let sql = `
+    SELECT *
+    FROM hod_db h
+    WHERE h.id = ?
+    `
+
+    let [result] = await pool.query(sql,[hod_id])
+
+    if(result.length<=0){
+
+        return res.status(200).json({
+            message:"hod not found in database"
+        })
+
+    }
+
+    return res.status(200).json({
+        message:"data founded successfully",
+        result
+    })
+    
+} catch (error) {
+    return res.status(500).json({
+        message:"error from hod profile ",
+        error
+    })
+}
+
+}
 
 export const add_teacher = async (req, res) => {
 
@@ -1094,14 +1134,33 @@ export const can_see_particular_class_student = async (req,res) => {
  try {
 
     let sql = `
-   SELECT a.id
-   FROM att_db a
-   WHERE a.student_id = ?
+   SELECT 
+    sb.id AS subject_id,
+    sb.subject,
+
+    COUNT(a.id) AS total_lectures,
+
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_count,
+
+    ROUND(
+        (SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) / COUNT(a.id)) * 100,
+        2
+    ) AS percentage
+
+FROM att_db a
+
+JOIN subject_db sb ON sb.id = a.subject_id
+
+WHERE a.student_id = ?
+
+GROUP BY a.subject_id, sb.subject
+
+
     `
     
 let [result] = await pool.query(sql,[student_id])
 
-return res.status.json({
+return res.status(200).json({
     message:"data collected successfully",
  result
 })
