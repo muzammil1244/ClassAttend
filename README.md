@@ -37,3 +37,8 @@ and Student roles.
 ### Student
 - View attendance history
 - view attendance score 
+
+## Environment Variable
+
+- TIDB_URL= your account and password
+- JWT_key = secret key 

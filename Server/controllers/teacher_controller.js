@@ -16,6 +16,41 @@ import { AsyncParser } from "@json2csv/node";
 //     return res.send("delete student ")
 // }
 
+
+export const profile=async(req,res)=>{
+let teacher_id = req.user?.id
+if(!teacher_id){
+    return res.status(401).json({
+        message:"teacher id not found here "
+    })
+}
+
+try {
+
+    let sql = `
+    SELECT *
+    FROM teacher_db t
+    WHERE t.id = ?
+    `
+    
+    let [result] = await pool.query(sql,[teacher_id])
+    if(result.length<=0){
+        return res.status(200).json({
+            message:"teacher not found in database "
+        })
+    }
+
+    return res.status(200).json({
+        message:"data collected successfully",
+        result
+    })
+} catch (error) {
+    return res.status(500).json({
+        message:"error from teacher profile"
+    })
+}
+}
+
 export const read_student = async (req, res) => {
     let class_id = req.params?.class
 

@@ -9,7 +9,7 @@ import bcrypt from "bcrypt"
 
 // CRUD  OPERATION WITH TEACHERS
 
-export const profile=async()=>{
+export const profile=async(req,res)=>{
     let hod_id = req.user?.id
 
     if(!hod_id){
