@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react"
 
-const Text_input = ({placholder,name,type,lbname,lbval,fun__value})=>{
+const Text_input = ({placholder,name,type,lbname,lbval,onChange})=>{
    
-    const [set_value,get_value] = useState(null)
-   
-    useEffect(()=>{
-fun__value=()=>get_value
-
-    },[set_value])
+    
    
    
    
-   return <div className="flex-row flex gap-4 justify-around items-center w-full h-full">
-    <label htmlFor={lbval}>{lbval}</label>
-    <input type={type} placeholder={placholder} name={name}
-    className=" outline-blue-300 hover:bg-white border-1 rounded-xl p-2 text-center 
+   return <div className=" w-full flex gap-2 justify-around items-center h-full">
+    <label className="text-white" htmlFor={lbval}>{lbval}</label>
+    <input onChange={(e)=>onChange(e.target.value)} type={type} placeholder={placholder} name={name}
+    className=" outline-orange-500 bg-white hover:bg-white border-1 rounded-xl p-2 text-center 
   font-semibold
     "
     />
