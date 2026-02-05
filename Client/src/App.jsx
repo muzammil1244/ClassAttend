@@ -11,9 +11,10 @@ function App() {
     <BrowserRouter>
     
     <Routes>
+             <Route path="/hod/dashboard" element={<Hod_dash />} />
+
       <Route path="/register" element={<Register />} />
       <Route path='/login' element={<Loging/>}/>
-       <Route path="/hod/dashboard" element={<Hod_dash />} />
     </Routes>
    
    </BrowserRouter>

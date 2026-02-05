@@ -26,8 +26,8 @@ export const Register = () => {
   const [failure_message, set_failure_message] = useState(false)
 
 
-// hooks calling 
- const navigate = useNavigate();
+  // hooks calling 
+  const navigate = useNavigate();
 
 
   // API CALL
@@ -66,7 +66,7 @@ export const Register = () => {
       }
 
       set_on_spiner(false);
-      navigate('/hod/dashboard');
+      navigate('/login');
       console.log("Register API success:", res);
     } catch (err) {
       set_on_spiner(false);
@@ -140,21 +140,19 @@ export const Register = () => {
     </div>
 
     {/* messages  */}
-  
-      {failure_message && <div className="w-screen h-screen absolute ">
-        <Failure_Message ok={()=>set_failure_message(false)}  heading={"Registration Failed"} message={"Please try again later."} />
-      </div>
 
-      }
-    
+    {failure_message && <div className="w-screen h-screen absolute ">
+      <Failure_Message ok={() => set_failure_message(false)} heading={"Registration Failed"} message={"Please try again later."} />
+    </div>
 
-
-      {success_message && <div className="w-screen h-screen absolute ">
-         <Succes_Message cancel={()=>set_success_message(false)} heading={"Registration Successful"} message={"You have been registered successfully."} />
-             </div>
-         }
+    }
 
 
+
+    {success_message && <div className="w-screen h-screen absolute ">
+      <Succes_Message cancel={() => set_success_message(false)} heading={"Registration Successful"} message={"You have been registered successfully."} />
+    </div>
+    }
 
 
 
@@ -163,7 +161,9 @@ export const Register = () => {
 
 
 
-</div>
+
+
+  </div>
 
 
 }
