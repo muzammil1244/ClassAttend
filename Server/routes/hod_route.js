@@ -36,7 +36,7 @@ hod_route.get("/read/course", read_courses)
 hod_route.post("/add/class/:id", add_classes)
 hod_route.patch("/update/class/:id", update_classes)
 hod_route.delete("/delete/class/:id", delete_classes)
-hod_route.get("/read/class", read_classes)
+hod_route.get("/read/class/:course_id", read_classes)
 
 // CRUD OPERATION OF CLASS
 

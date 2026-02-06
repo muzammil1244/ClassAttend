@@ -635,7 +635,7 @@ export const delete_classes = async (req, res) => {
 export const read_classes = async (req, res) => {
 
     let hod_id = req.user?.id
-
+let course_id = req.params.course_id
     try {
         if (!hod_id) {
             return res.status(401).json({
@@ -648,11 +648,11 @@ SELECT cl.*
 FROM classes_db as cl
 JOIN course_db c 
 ON cl.course_id = c.id
-WHERE c.hod_id = ?
+WHERE c.hod_id = ?  c.id= ?
 
 `
 
-        let [result] = await pool.query(sql, [hod_id])
+        let [result] = await pool.query(sql, [hod_id,course_id])
 
         return res.status(200).json({
             message: "class read success",
