@@ -114,11 +114,11 @@ const [open_course,set_open_course] = useState(false)
 
         // 🔹 2. Subject wise score
         const subjectRes = await fetch(
-            `${import.meta.env.VITE_DOMAIN}/hod/subject/score/${Class_id}/${get_courseId_date.course}/${get_courseId_date.date}`,
+            `${import.meta.env.VITE_DOMAIN}/hod/subject/score/${Number(Class_id)}/${get_courseId_date.course}/${get_courseId_date.date}`,
             { method: "GET", headers }
         )
 
-        console.log("class score parameter" , Class_id,get_courseId_date.course,get_courseId_date.date )
+        console.log("class score parameter" ,Number(Class_id),get_courseId_date.course,get_courseId_date.date )
         const subjectData = await subjectRes.json()
         set_subject_score(subjectData)
 

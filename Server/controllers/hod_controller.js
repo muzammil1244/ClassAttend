@@ -9,44 +9,44 @@ import bcrypt from "bcrypt"
 
 // CRUD  OPERATION WITH TEACHERS
 
-export const profile=async(req,res)=>{
+export const profile = async (req, res) => {
     let hod_id = req.user?.id
 
-    if(!hod_id){
+    if (!hod_id) {
         return res.status(401).json({
-            message:"hod id not found here "
+            message: "hod id not found here "
         })
     }
 
-try {
+    try {
 
-    let sql = `
+        let sql = `
     SELECT *
     FROM hod_db h
     WHERE h.id = ?
     `
 
-    let [result] = await pool.query(sql,[hod_id])
+        let [result] = await pool.query(sql, [hod_id])
 
-    if(result.length<=0){
+        if (result.length <= 0) {
+
+            return res.status(200).json({
+                message: "hod not found in database"
+            })
+
+        }
 
         return res.status(200).json({
-            message:"hod not found in database"
+            message: "data founded successfully",
+            result
         })
 
+    } catch (error) {
+        return res.status(500).json({
+            message: "error from hod profile ",
+            error
+        })
     }
-
-    return res.status(200).json({
-        message:"data founded successfully",
-        result
-    })
-    
-} catch (error) {
-    return res.status(500).json({
-        message:"error from hod profile ",
-        error
-    })
-}
 
 }
 
@@ -635,7 +635,7 @@ export const delete_classes = async (req, res) => {
 export const read_classes = async (req, res) => {
 
     let hod_id = req.user?.id
-let course_id = req.params?.course_id
+    let course_id = req.params?.course_id
     try {
         if (!hod_id) {
             return res.status(401).json({
@@ -652,7 +652,7 @@ WHERE c.hod_id = ? AND  c.id= ?
 
 `
 
-        let [result] = await pool.query(sql, [hod_id,course_id])
+        let [result] = await pool.query(sql, [hod_id, course_id])
 
         return res.status(200).json({
             message: "class read success",
@@ -1045,38 +1045,49 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 // Can see particular subject attendancely score status 
 
 export const see_particular_subject = async (req, res) => {
-    // const course_id = req.params.course
+    const course_id = req.params.course
     const class_id = req.params?.class
     const date = req.params?.date
-
+    const classId = Number(class_id)
+    const courseID = Number(course_id)
+    console.log(typeof (classId), classId, typeof (courseID), courseID, typeof (date), date)
     try {
         const sql = `
-SELECT 
-    sd.subject AS subject_name,
-    t.name AS teacher_name
-FROM att_db a
+ SELECT
+           s.id AS subject_id,
+    s.subject,
+    t.id AS teacher_id,
+    t.name AS name,
 
-JOIN class_subject_db csd 
-    ON csd.class_id = a.class_id
+    COUNT(a.student_id) AS total_students,
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_students,
 
-
-JOIN subject_db sd 
-    ON sd.id = csd.subject_id
-
-JOIN teacher_db t 
-    ON t.id = csd.teacher_id
-
-WHERE 
-    csd.id = ?
-    AND a.att_date = ?
-
+    ROUND(
+        SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END)
+        / COUNT(a.student_id) * 100
+    ) AS percentage
+           
+        FROM att_db a
+        JOIN class_subject_db cs 
+          ON cs.id = a.class_id
+        JOIN classes_db c ON c.id = cs.class_id
+        JOIN course_db cr 
+          ON cr.id = c.course_id
+        JOIN subject_db s ON s.id = cs.subject_id
+        JOIN teacher_db t ON t.id = cs.teacher_id
+        WHERE cr.id = ?
+  AND c.id = ?
+  AND a.att_date = ?
+ 
 GROUP BY 
-    sd.subject, t.name;
+    s.id, s.subject, t.id, t.name;
+
+
 
 
  `
 
-        const [result] = await pool.query(sql, [ class_id,, date])
+        const [result] = await pool.query(sql, [courseID, classId, date])
 
         return res.status(200).json({
             message: "subject wise attendance fetched successfully",
@@ -1116,10 +1127,10 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
         `
 
 
-        let [result] = await pool.query(sql,[student_id,roll_no])
+        let [result] = await pool.query(sql, [student_id, roll_no])
 
         return res.status(200).json({
-            message:"data collect successfully",
+            message: "data collect successfully",
             result
         })
     } catch (error) {
@@ -1133,19 +1144,19 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 
 // Can see particular student by class name
 
-export const can_see_particular_class_student = async (req,res) => {
+export const can_see_particular_class_student = async (req, res) => {
 
     let student_id = req.params?.student
-    
-    if(!student_id){
+
+    if (!student_id) {
         return res.status(401).json({
-            message:"data not found here all field required "
+            message: "data not found here all field required "
         })
     }
 
- try {
+    try {
 
-    let sql = `
+        let sql = `
    SELECT 
     sb.id AS subject_id,
     sb.subject,
@@ -1169,22 +1180,22 @@ GROUP BY a.subject_id, sb.subject
 
 
     `
-    
-let [result] = await pool.query(sql,[student_id])
 
-return res.status(200).json({
-    message:"data collected successfully",
- result
-})
+        let [result] = await pool.query(sql, [student_id])
+
+        return res.status(200).json({
+            message: "data collected successfully",
+            result
+        })
 
 
- }catch (error) {
-    
-    return res.status(500).json({
-        message:"err from reading score of  student base on subjects ",
-        error
-    })
- }
+    } catch (error) {
+
+        return res.status(500).json({
+            message: "err from reading score of  student base on subjects ",
+            error
+        })
+    }
 
 }
 
