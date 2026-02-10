@@ -10,15 +10,15 @@ export const Crud_teacher = () => {
         <div className="w-full h-full bg-amber-500 ">
 
             <div className="w-full h-full relative   bg-slate-100 gap-5 grid grid-cols-2">
-<div className=" absolute top-5 left-5 ">
-    <h2 className="text-xl font-semibold text-orange-400">Add OR Update teacher </h2>
+<div className=" absolute top-5 left-5 w-fit h-fit bg-gray-900  rounded-2xl ">
+    <h2 className="text-sm font-semibold text-white px-4 py-2">Add OR Update teacher </h2>
 </div>
 
 
 
-                <div className="bg-white justify-center items-center flex w-full h-full rounded-2xl ">
+                <div className="bg-white justify-center items-center flex w-full h-full  shadow rounded-2xl ">
 
-                    <form className="flex flex-col gap-5" action="">
+                    <form className="flex bg-white shadow rounded-2xl p-4 flex-col gap-5" action="">
 
                         <Text_input placholder={"email"} name={"email"} type={"email"} lbname={"email"} lbval={<LuAtSign color="black" />} />
                         <Text_input placholder={"password"} name={"password"} type={"password"} lbname={"password"} lbval={<LuLock color="black" />} />

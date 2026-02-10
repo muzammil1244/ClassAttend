@@ -9,8 +9,8 @@ export const Crud_subjects = () =>{
         <div className="w-full h-full bg-amber-500 ">
 
             <div className="w-full h-full relative   bg-slate-100 gap-5 grid grid-cols-2">
-<div className=" absolute top-5 left-5 ">
-    <h2 className="text-xl font-semibold text-black">Add OR Delete subject </h2>
+ <div className="  absolute top-5 left-4  w-fit h-fit bg-gray-900  rounded-2xl ">
+    <h2 className="text-sm font-semibold text-white px-4 py-2">Add OR Update classes </h2>
 </div>
 
 
@@ -42,7 +42,7 @@ export const Crud_subjects = () =>{
                     {/* Header */}
                     <div className="bg-white flex gap-4 items-center justify-center shadow w-full h-fit rounded-2xl p-4">
                     
-                    <div className="bg-orange-100 p-2 rounded-xl">
+                    <div className="bg-white shadow p-2 rounded-xl">
                                              <LuSearch  size={30}/>
 
                     </div>

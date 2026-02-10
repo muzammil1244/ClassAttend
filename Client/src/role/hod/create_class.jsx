@@ -4,12 +4,12 @@ import Ok_button, { Delete_button } from "../../component/buttons"
 
 export const Create_Classes = () => {
 
-    return <div className=" w-full bg-white p-5 overflow-y-scroll flex flex-col gap-5  h-full   rounded-2xl">
+    return <div className=" w-full  bg-white p-5 overflow-y-scroll flex flex-col gap-5  h-full   rounded-2xl">
         {/* headers */}
 
-        <div className="w-full bg-white px-5    h-fit">
-            <h1 className="text-orange-500 font-bold   text-xl ">Crate Classes</h1>
-        </div>
+       <div className="  shadow w-fit h-fit bg-gray-900  rounded-2xl ">
+    <h2 className="text-sm font-semibold text-white px-4 py-2">Add OR Update classes </h2>
+</div>
 
 {/* create classes  */}
 
@@ -27,9 +27,17 @@ export const Create_Classes = () => {
 <input className="w-full outline-orange-500 px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="Class Name " name="class" />
 </label>
 <label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
-<input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="Class Name " name="class" />
-</label><label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
-<input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="Class Name " name="class" />
+<input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="number" placeholder="Year " name="year" />
+</label>
+<label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
+<select className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]">
+
+<option value="">bca</option>
+<option value="">bca</option>
+<option value="">bca</option>
+
+</select>
+
 </label>
 
 <Ok_button text={"Create"}/>
@@ -52,12 +60,12 @@ export const Create_Classes = () => {
 
 
 
-<label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
+<label className="flex items-center justify-center  gap-3" ><LuUserRound/>
 <input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="name " name="name" />
 </label>
-<label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
+<label className="flex items-center justify-center  gap-3" ><LuAtSign/>
 <input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="email" placeholder="email " name="email" />
-</label><label className="flex items-center justify-center  gap-3" ><LuBuilding2/>
+</label><label className="flex items-center justify-center  gap-3" ><LuLock/>
 <input className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="password" placeholder="password " name="password" />
 </label>
 <label className="flex items-center justify-center  gap-3" ><LuBuilding2/>

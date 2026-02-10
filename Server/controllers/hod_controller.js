@@ -635,7 +635,7 @@ export const delete_classes = async (req, res) => {
 export const read_classes = async (req, res) => {
 
     let hod_id = req.user?.id
-let course_id = req.params.course_id
+let course_id = req.params?.course_id
     try {
         if (!hod_id) {
             return res.status(401).json({
@@ -648,7 +648,7 @@ SELECT cl.*
 FROM classes_db as cl
 JOIN course_db c 
 ON cl.course_id = c.id
-WHERE c.hod_id = ?  c.id= ?
+WHERE c.hod_id = ? AND  c.id= ?
 
 `
 
@@ -663,7 +663,7 @@ WHERE c.hod_id = ?  c.id= ?
 
     } catch (error) {
         return res.status(500).json({
-            message: " read classes problme her ",
+            message: " read classes problem her ",
             error
         })
     }
@@ -1045,41 +1045,53 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 // Can see particular subject attendancely score status 
 
 export const see_particular_subject = async (req, res) => {
-    let course_id = req.params?.course
-    let class_id = req.params?.class
-    let date = req.params?.date
-    let subject_id = req.params?.sub
+    // const course_id = req.params.course
+    const class_id = req.params?.class
+    const date = req.params?.date
+
     try {
+        const sql = `
+SELECT 
+    sd.subject AS subject_name,
+    t.name AS teacher_name
+FROM att_db a
 
-        let sql = `
-        SELECT
-        COUNT(*) AS total_student,
-        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_student,
-ROUND(
-SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
-) AS percentage
-    FROM att_db a
-        JOIN class_subject_db cs ON cs.id = a.class_id
-        JOIN classes_db c ON c.id = cs.class_id
-        JOIN course_db cr ON cr.id = c.course_id
-        WHERE cr.id = ? AND c.id = ? AND a.att_date = ? AND a.subject_id = ? 
-       
-        `
+JOIN class_subject_db csd 
+    ON csd.class_id = a.class_id
 
-        let [result] = await pool.query(sql, [course_id, class_id, date, subject_id])
+
+JOIN subject_db sd 
+    ON sd.id = csd.subject_id
+
+JOIN teacher_db t 
+    ON t.id = csd.teacher_id
+
+WHERE 
+    csd.id = ?
+    AND a.att_date = ?
+
+GROUP BY 
+    sd.subject, t.name;
+
+
+ `
+
+        const [result] = await pool.query(sql, [ class_id,, date])
 
         return res.status(200).json({
-            message: "data collected successfully",
-            result
+            message: "subject wise attendance fetched successfully",
+            data: result
         })
 
     } catch (err) {
+        console.log(err)
         return res.status(500).json({
-            message: "error from reading subject wise score ",
-            err
+            message: "error from reading subject wise score",
+            error: err.message
         })
     }
 }
+
 // Can see particular student attendancely score status
 
 export const see_particular_student = async (req, res) => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { LuActivity, LuAtSign, LuBuilding, LuHouse, LuUserRound, LuUsersRound } from "react-icons/lu"
+import { LuActivity, LuAtSign, LuBuilding, LuFolderArchive, LuHouse, LuPlus, LuSettings, LuTable, LuUserRound, LuUserSearch, LuUsersRound } from "react-icons/lu"
 import { SlHome, SlUser } from "react-icons/sl"
 import Ok_button from "../component/buttons"
 import CirclePercentage from "../component/circle_progress"
@@ -22,7 +22,8 @@ export const Hod_dash = () => {
         course_name: ""
     })
     const [get_classes, set_classes] = useState([])
-
+    const [get_class_score , set_class_score] = useState([])
+const [get_subject_score ,set_subject_score ] = useState([])
 
     // menu buttons
 
@@ -95,28 +96,45 @@ const [open_course,set_open_course] = useState(false)
     }
 
 
-    const class_score = async () => {
-        try {
-            const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/class/score/${30001}/${2}/${"2026-01-10"}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            const data = await react.json()
-            console.log("class score", data)
-        } catch (error) {
-            return console.log(error)
+    const class_score = async (Class_id) => {
+    try {
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
+
+        // 🔹 1. Class overall score
+        const classRes = await fetch(
+            `${import.meta.env.VITE_DOMAIN}/hod/class/score/${Class_id}/${get_courseId_date.course}/${get_courseId_date.date}`,
+            { method: "GET", headers }
+        )
+
+        const classData = await classRes.json()
+        set_class_score(classData.result?.[0] || null)
+
+        // 🔹 2. Subject wise score
+        const subjectRes = await fetch(
+            `${import.meta.env.VITE_DOMAIN}/hod/subject/score/${Class_id}/${get_courseId_date.course}/${get_courseId_date.date}`,
+            { method: "GET", headers }
+        )
+
+        console.log("class score parameter" , Class_id,get_courseId_date.course,get_courseId_date.date )
+        const subjectData = await subjectRes.json()
+        set_subject_score(subjectData)
+
+        console.log("Class score:", classData)
+        console.log("Subject score:", subjectData)
+
+    } catch (error) {
+        console.log("Error fetching class/subject score:", error)
     }
+}
+
 
     const read_classes = async () => {
         if (!get_courseId_date.course > 0) {
             console.log("course id not found ", get_courseId_date)
             return false
-        } else {
-            console.log("user id founded here ", get_courseId_date)
         }
         try {
             const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/class/${get_courseId_date.course}`, {
@@ -134,9 +152,34 @@ const [open_course,set_open_course] = useState(false)
         }
     }
 
+// const subject_scores ()=>{
+//       if (!get_courseId_date.course > 0) {
+//             console.log("course id not found ", get_courseId_date)
+//             return false
+//         }
+//         try {
+//             const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/class/${get_courseId_date.course}`, {
+//                 method: "GET",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                     "Authorization": `Bearer ${localStorage.getItem("token")}`
+//                 }
+//             })
+//             const data = await react.json()
+//             console.log("classes", data.data)
+//             set_classes(data.data)
+//         } catch (error) {
+//             return console.log(error)
+//         }
+// }
+
+
+
+
     const change_course_date = () => {
         course_score(Number(get_courseId_date.course), get_courseId_date.date)
     }
+
 
 
     // menu functions
@@ -243,12 +286,12 @@ const open_course_fun = () =>{
                     <div className="h-full w-full py-4" >
                         <ul className="w-full flex flex-col justify-between h-full text-[15px] ">
                             <li onClick={open_home_fun} className=" bg-white shadow rounded-xl py-5 hover:scale-105 flex justify-center duration-100 cursor-pointer shadow-gray-500 p-1 text-center"><LuHouse size={20} /></li>
-                            <li onClick={open_teacher_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Teacher</li>
-                            <li onClick={open_student_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Student</li>
-                            <li onClick={open_course_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Course</li>
-                            <li onClick={open_classes_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Class</li>
-                            <li onClick={open_subjects_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Subject</li>
-                            <li className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center">Attendance</li>
+                            <li onClick={open_teacher_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> < LuSettings/> Teacher</li>
+                            <li onClick={open_student_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> <LuUserSearch/>Student</li>
+                            <li onClick={open_course_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> <LuSettings/>Course</li>
+                            <li onClick={open_classes_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> < LuPlus/>Class</li>
+                            <li onClick={open_subjects_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center" > <LuSettings/>Subject</li>
+                            <li className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"><LuTable/> Attendance</li>
 
 
                         </ul>
@@ -355,13 +398,26 @@ const open_course_fun = () =>{
                             </div>
 
                             <div className="m-5">
-                                <select className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                                >
-                                    <option value={"0"}>Select class</option>
-                                    <option value={"0"}>Select class</option>
-                                    <option value={"0"}>Select class</option>
+                              {get_classes.length > 0 ? (
+    <select
+        onChange={(e) => class_score(e.target.value)}
+        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+    >
+        <option value="0">Select class</option>
 
-                                </select>
+        {get_classes.map((item, index) => (
+            <option key={index} value={item.id}>
+                {item.class_name} {item.class_year}
+            </option>
+        ))}
+    </select>
+) : (
+    <select className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+        <option value="0">Select course first</option>
+    </select>
+)}
+
+                               
                             </div>
 
 
@@ -369,15 +425,15 @@ const open_course_fun = () =>{
 
                                 <div className="flex h-fit gap-5">
                                     <div className=" h-50 w-50 justify-center items-center flex flex-col gap-4 bg-orange-100 px-10 py-4 rounded-2xl">
-                                        <CircleProgress size={100} />
+                                        <CircleProgress size={100} value={get_class_score.percentage} />
                                         <h1 className="text-orange-500 font-bold ">class name </h1>
                                     </div>
 
                                     <div className=" h-50 w-50  items-center flex justify-between flex-col gap-4 bg-gray-100 px-10 py-4 rounded-2xl">
                                         <h1 className="text-orange-500 font-extralight text-xl">more</h1>
                                         <div className="flex- flex-col py-10 gap-3">
-                                            <h1 className="flex gap-2 items-center text-lg justify-center"><LuUsersRound /> all : 500</h1>
-                                            <h1 className="flex gap-2 px-0 items-center text-lg justify-center"><LuUsersRound /> present : 50</h1>
+                                            <h1 className="flex gap-2 items-center text-lg justify-center"><LuUsersRound /> all :{get_class_score.total_student}</h1>
+                                            <h1 className="flex gap-2 px-0 items-center text-lg justify-center"><LuUsersRound /> present :{get_class_score.present_student}</h1>
 
                                         </div>
                                     </div>
