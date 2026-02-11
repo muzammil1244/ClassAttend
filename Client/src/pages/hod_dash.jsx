@@ -120,7 +120,7 @@ const [open_course,set_open_course] = useState(false)
 
         console.log("class score parameter" ,Number(Class_id),get_courseId_date.course,get_courseId_date.date )
         const subjectData = await subjectRes.json()
-        set_subject_score(subjectData)
+        set_subject_score(subjectData.data)
 
         console.log("Class score:", classData)
         console.log("Subject score:", subjectData)
@@ -316,233 +316,155 @@ const open_course_fun = () =>{
                 {/* HOME */}
 
                 {
-                    open_home && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
+                    open_home && <div className="col-span-4 h-full w-full rounded-3xl bg-gradient-to-br from-slate-100 to-slate-200 p-6 overflow-y-auto">
 
-                        {/* Header */}
-                        <div className="mb-4 flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
-                            <h1 className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-                                {get_courseId_date.course_name || "Course"} Activity
-                                <LuActivity className="text-blue-500" />
-                            </h1>
-                        </div>
+  {/* ===== Header ===== */}
+  <div className="mb-6 flex items-center justify-between rounded-3xl bg-white p-5 shadow-md">
+    <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+      <LuActivity className="text-blue-500" />
+      {get_courseId_date.course_name || "Course"} Activity
+    </h1>
+  </div>
 
-                        {/* Main Card */}
-                        <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-white p-6 shadow-sm">
+  {/* ===== Main Stats Card ===== */}
+  <div className="flex flex-wrap items-center justify-between gap-8 rounded-3xl bg-white p-8 shadow-md">
 
-                            {/* Circular Progress */}
-                            <div className="flex flex-col items-center gap-2">
-                                <CircleProgress value={get_course_score.percentage || 0} />
-                                <p className="text-sm font-medium text-gray-500">Overall Attendance</p>
-                            </div>
+    {/* Overall Attendance */}
+    <div className="flex flex-col items-center gap-3">
+      <CircleProgress value={get_course_score.percentage || 0} />
+      <p className="text-sm font-semibold text-gray-500">
+        Overall Attendance
+      </p>
+    </div>
 
-                            {/* Filters */}
-                            <div className="flex w-full max-w-xs flex-col gap-4">
-                                <select
-                                    onChange={(e) => {
-                                        const selectedId = Number(e.target.value);
-                                        const selectedCourse = get_courses.find(
-                                            item => item.id === selectedId
-                                        );
+    {/* Filters */}
+    <div className="flex w-full max-w-xs flex-col gap-4">
+      <select
+        onChange={(e) => {
+          const selectedId = Number(e.target.value);
+          const selectedCourse = get_courses.find(item => item.id === selectedId);
 
-                                        set_courseId_date(prev => ({
-                                            ...prev,
-                                            course: selectedCourse?.id || 0,
-                                            course_name: selectedCourse?.name || ""
-                                        }));
-                                    }}
-                                    className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                                >
-                                    <option value="0">Select Course</option>
-                                    {get_courses.map(item => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
-
-                                <input
-                                    type="date"
-                                    onChange={(e) =>
-                                        set_courseId_date(pre => ({
-                                            ...pre,
-                                            date: e.target.value
-                                        }))
-                                    }
-                                    className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                                />
-
-                                <Ok_button text="Apply" onClick={change_course_date} />
-                            </div>
-
-                            {/* Stats */}
-                            <div className="flex flex-col gap-3 rounded-xl bg-slate-50 px-6 py-4">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
-                                    <LuUsersRound />
-                                    Present: {get_course_score.present_student || 0}
-                                </div>
-
-                                <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
-                                    <LuUsersRound />
-                                    Total: {get_course_score.total_student || 0}
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Future Section */}
-                        <div className="mt-4 h-fit rounded-2xl bg-white p-4 shadow-sm">
-                            {/* description  */}
-
-                            <div>
-                                <p>firstly you have to choose course and after that you are able to see score or classes </p>
-                            </div>
-
-                            <div className="m-5">
-                              {get_classes.length > 0 ? (
-    <select
-        onChange={(e) => class_score(e.target.value)}
-        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-    >
-        <option value="0">Select class</option>
-
-        {get_classes.map((item, index) => (
-            <option key={index} value={item.id}>
-                {item.class_name} {item.class_year}
-            </option>
+          set_courseId_date(prev => ({
+            ...prev,
+            course: selectedCourse?.id || 0,
+            course_name: selectedCourse?.name || ""
+          }));
+        }}
+        className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+      >
+        <option value="0">Select Course</option>
+        {get_courses.map(item => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
         ))}
-    </select>
-) : (
-    <select className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
-        <option value="0">Select course first</option>
-    </select>
-)}
+      </select>
 
-                               
-                            </div>
+      <input
+        type="date"
+        onChange={(e) =>
+          set_courseId_date(pre => ({
+            ...pre,
+            date: e.target.value
+          }))
+        }
+        className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+      />
 
+      <Ok_button text="Apply" onClick={change_course_date} />
+    </div>
 
-                            <div className="w-full  flex flex-col gap-4 justify-around items-center h-fit">
+    {/* Present / Total */}
+    <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 px-6 py-5">
+      <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
+        <LuUsersRound />
+        Present: {get_course_score.present_student || 0}
+      </div>
 
-                                <div className="flex h-fit gap-5">
-                                    <div className=" h-50 w-50 justify-center items-center flex flex-col gap-4 bg-orange-100 px-10 py-4 rounded-2xl">
-                                        <CircleProgress size={100} value={get_class_score.percentage} />
-                                        <h1 className="text-orange-500 font-bold ">class name </h1>
-                                    </div>
+      <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
+        <LuUsersRound />
+        Total: {get_course_score.total_student || 0}
+      </div>
+    </div>
+  </div>
 
-                                    <div className=" h-50 w-50  items-center flex justify-between flex-col gap-4 bg-gray-100 px-10 py-4 rounded-2xl">
-                                        <h1 className="text-orange-500 font-extralight text-xl">more</h1>
-                                        <div className="flex- flex-col py-10 gap-3">
-                                            <h1 className="flex gap-2 items-center text-lg justify-center"><LuUsersRound /> all :{get_class_score.total_student}</h1>
-                                            <h1 className="flex gap-2 px-0 items-center text-lg justify-center"><LuUsersRound /> present :{get_class_score.present_student}</h1>
+  {/* ===== Class & Subject Section ===== */}
+  <div className="mt-6 rounded-3xl bg-white p-6 shadow-md">
 
-                                        </div>
-                                    </div>
-                                </div>
-                                <p>the all subject of the classes mad by you hod </p>
+    <p className="mb-5 text-sm text-gray-500">
+      👉 First select a course, then view class and subject-wise attendance.
+    </p>
 
+    {/* Class Selector */}
+    <div className="mb-6">
+      {get_classes.length > 0 ? (
+        <select
+          onChange={(e) => class_score(e.target.value)}
+          className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+        >
+          <option value="0">Select Class</option>
+          {get_classes.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.class_name} {item.class_year}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <select className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm">
+          <option>Select course first</option>
+        </select>
+      )}
+    </div>
 
-                                <div className=" w-full  h-fit flex
-                            items-center justify-center p-4 rounded-2xl ">
+    {/* Class Stats */}
+    <div className="flex flex-wrap justify-center gap-6 mb-8">
 
-                                    <div className=" grid grid-cols-2 gap-y-5 gap-x-11 justify-around   w-fit ">
+      <div className="flex flex-col items-center gap-4 rounded-3xl bg-orange-100 px-10 py-6 shadow-sm">
+        <CircleProgress size={110} value={get_class_score.percentage} />
+        <h1 className="text-orange-600 font-bold text-lg">
+          Class Attendance
+        </h1>
+      </div>
 
+      <div className="flex flex-col justify-center gap-4 rounded-3xl bg-gray-100 px-10 py-6 shadow-sm">
+        <h1 className="text-center text-gray-600 font-semibold">
+          Details
+        </h1>
+        <h1 className="flex gap-2 items-center justify-center">
+          <LuUsersRound /> Total: {get_class_score.total_student}
+        </h1>
+        <h1 className="flex gap-2 items-center justify-center">
+          <LuUsersRound /> Present: {get_class_score.present_student}
+        </h1>
+      </div>
+    </div>
 
-                                        <div className=" justify-around  w-80 p-4 rounded-2xl gap-2 flex  bg-green-100 ">
+    {/* ===== Subject Cards ===== */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
+      {get_subject_score.length > 0 &&
+        get_subject_score.map((item, index) => (
+          <div
+            key={index}
+            className="flex gap-5 rounded-3xl bg-gradient-to-br from-green-100 to-green-50 p-5 shadow-sm hover:shadow-md transition"
+          >
+            <div className="flex flex-col items-center gap-2">
+              <CircleProgress size={75} value={item.percentage} />
+              <h1 className="font-bold text-sm">{item.subject}</h1>
+            </div>
 
-                                            <div className="flex w-fit h-fit flex-col justify-center items-center ">
-                                                <CircleProgress size={70} />
-                                                <h1 className=" font-bold text-sm ">subject name </h1>
-                                            </div>
+            <div className="flex flex-col gap-2 justify-center">
+              <h1 className="flex items-center gap-2 text-sm">
+                <SlUser /> {item.name}
+              </h1>
+              <p className="text-sm">Total: {item.total_students}</p>
+              <p className="text-sm">Present: {item.present_students}</p>
+            </div>
+          </div>
+        ))}
+    </div>
 
-                                            <div className="w-fit h-full border-l-1 border border-white"></div>
-
-                                            <div className="flex flex-col gap-2">
-                                                <h1 className=" items-center justify-center font-extralight break-keep flex gap-2"><SlUser size={15} /> rehman sir </h1>
-
-                                                <div className="">
-                                                    <h1>total:500</h1>
-                                                    <h1>present:500</h1>
-                                                </div>
-
-
-                                            </div>
-
-                                        </div>
-
-
-                                        <div className=" justify-around  w-80 p-4 rounded-2xl gap-2 flex  bg-green-100 ">
-
-                                            <div className="flex w-fit h-fit flex-col justify-center items-center ">
-                                                <CircleProgress size={70} />
-                                                <h1 className=" font-bold text-sm ">subject name </h1>
-                                            </div>
-
-
-                                            <div className="flex flex-col gap-2">
-                                                <h1 className=" items-center justify-center font-extralight break-keep flex gap-2"><SlUser size={15} /> rehman sir </h1>
-
-                                                <div className="">
-                                                    <h1>total:500</h1>
-                                                    <h1>present:500</h1>
-                                                </div>
-
-
-                                            </div>
-
-                                        </div>
-
-                                        <div className=" justify-around  w-80 p-4 rounded-2xl gap-2 flex  bg-green-100 ">
-
-                                            <div className="flex w-fit h-fit flex-col justify-center items-center ">
-                                                <CircleProgress size={70} />
-                                                <h1 className=" font-bold text-sm ">subject name </h1>
-                                            </div>
-
-
-                                            <div className="flex flex-col gap-2">
-                                                <h1 className=" items-center justify-center font-extralight break-keep flex gap-2"><SlUser size={15} /> rehman sir </h1>
-
-                                                <div className="">
-                                                    <h1>total:500</h1>
-                                                    <h1>present:500</h1>
-                                                </div>
-
-
-                                            </div>
-
-                                        </div>
-
-                                        <div className=" justify-around  w-80 p-4 rounded-2xl gap-2 flex  bg-green-100 ">
-
-                                            <div className="flex w-fit h-fit flex-col justify-center items-center ">
-                                                <CircleProgress size={70} />
-                                                <h1 className=" font-bold text-sm ">subject name </h1>
-                                            </div>
-
-
-                                            <div className="flex flex-col gap-2">
-                                                <h1 className=" items-center justify-center font-extralight break-keep flex gap-2"><SlUser size={15} /> rehman sir </h1>
-
-                                                <div className="">
-                                                    <h1>total:500</h1>
-                                                    <h1>present:500</h1>
-                                                </div>
-
-
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-                        </div>
-
-                    </div>
+  </div>
+</div>
 
                 }
 
@@ -579,7 +501,7 @@ open_subjects && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-1
 
 {
 open_course &&<div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
-                        <Crud_course />
+                        <Crud_course coursecourses_datas={get_courses} />
                     </div>
 
 }

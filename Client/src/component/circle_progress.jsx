@@ -30,7 +30,9 @@ const CircleProgress = ({ value = 0 ,size = 200}) => {
         width:size-size/5,
         height:size-size/5
       }} className="w-[110px] h-[110px] rounded-full bg-white flex items-center justify-center text-2xl font-bold">
-        {progress}%
+      <h1 style={{
+        fontSize : size/5
+      }}>{progress}%</h1>  
       </div>
     </div>
   );
