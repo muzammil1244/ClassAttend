@@ -501,7 +501,7 @@ open_subjects && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-1
 
 {
 open_course &&<div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
-                        <Crud_course coursecourses_datas={get_courses} />
+                        <Crud_course  course_data={get_courses} reload={()=>courses()} />
                     </div>
 
 }

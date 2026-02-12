@@ -4,7 +4,7 @@ import { LuAtSign, LuSearch } from "react-icons/lu";
 import Text_input from "../../component/inputfiled";
 import Ok_button, { Cancel_button, Delete_button } from "../../component/buttons";
 
-export const Crud_course = (courses_data) => {
+export const Crud_course = ({course_data=[] , reload}) => {
 
     
   // ✅ Form State
@@ -19,53 +19,56 @@ export const Crud_course = (courses_data) => {
   // ✅ Search
   const [search, setSearch] = useState("");
 
+  const [ filteredCourses , set_filteredCourses] = useState([])
+
 useEffect(()=>{
-    setCourses(courses_data.coursecourses_datas)
-   console.log("Course List",courses_data.coursecourses_datas)
+    setCourses(course_data.coursecourses_datas)
+   console.log("Course List",course_data.coursecourses_datas)
 },[])
 
 
+console.log(get)
 //   API call
 
-let token = localStorage.getItem("token")
 
 
 //   submit data 
 
-  const handleSubmit =async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (courseName.trim() === "") return;
-try {
-    
-let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/add/course`,{
-    method:"POST",
-    headers:{
-        
+  const token = localStorage.getItem("token");  // 🔥 yahan lo
 
-         "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-    },
-    body:JSON.stringify({courseName})
-})
+  if (!token) {
+    console.log("No token found, login required");
+    return;
+  }
 
-if(!response.ok){
-    console.log("data not pushed")
-}
+  try {
+    const response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/add/course`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,   // 👈 MUST Bearer
+      },
+      body: JSON.stringify({ courseName }),
+    });
 
-console.log("data have submited",response)
+    if (!response.ok) {
+      console.log("data not pushed", response.status);
+      return;
+    }
 
+    const data = await response.json();
+    console.log("data submitted", data);
 
     setCourseName("");
-return true
 
-} catch (error) {
-return console.log(error)
-}
- 
-    
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  };
 
   const handleDelete = (index) => {
     const filtered = courses.filter((_, i) => i !== index);
@@ -76,9 +79,13 @@ return console.log(error)
     setCourseName(courses[index]);
     setEditIndex(index);
   };
-
-    const filteredCourses = courses.filter((course) =>
+  
+  useEffect(()=>{
+const data = courses.filter((course) =>
     course.name.toLowerCase().includes(search.toLowerCase()))
+set_filteredCourses(data)
+  },[search])
+    
 
   
   ;
@@ -96,20 +103,18 @@ return console.log(error)
         {/* ================= FORM ================= */}
         <div className="bg-white flex justify-center items-center rounded-2xl">
           <form
-            onSubmit={handleSubmit}
             className="flex flex-col bg-white shadow rounded-2xl p-5 gap-5 w-[80%]"
           >
             <Text_input
               placholder="Course Name"
               name="course"
               type="text"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
+              onChange={(value) => setCourseName(value)}
               lbname="course"
               lbval={<LuAtSign />}
             />
 
-            <Ok_button text={editIndex !== null ? "Update" : "Add"} />
+            <Ok_button onClick={handleSubmit} text={editIndex !== null ? "Update" : "Add"} />
           </form>
         </div>
 
