@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LuAtSign, LuLock, LuPhone, LuUserRound } from "react-icons/lu";
 import { SlLock, SlPhone } from "react-icons/sl";
 
@@ -8,11 +8,13 @@ import Ok_button, { Delete_button } from "../../component/buttons";
 export const Crud_teacher = () => {
   // ✅ Form State
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
-    number: "",
-    gender: "male",
+    
+      email: "",
+      password: "",
+      name: "",
+      number: "",
+      gender: "",
+    
   });
 
   // ✅ Teachers List
@@ -21,50 +23,136 @@ export const Crud_teacher = () => {
   // ✅ For Update Mode
   const [editIndex, setEditIndex] = useState(null);
 
+
+// api call
+
+let token = localStorage.getItem("token")
+
+const read_teacher=async()=>{
+try {
+
+  let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/teacher`,{
+    method:"GET",
+    headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+  }
+  )
+  let data = await response.json()
+
+  if(!response.ok){
+    return console.log("response err",response)
+  }
+  setTeachers(data.data)
+  console.log("teacher list", data)
+} catch (error) {
+  return console.log(error)
+}
+}
+
+
+useEffect(()=>{
+read_teacher()
+},[])
+
   // ✅ Handle Input Change
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+ 
 
   // ✅ Add / Update Teacher
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (editIndex !== null) {
-      // Update
-      const updatedTeachers = [...teachers];
-      updatedTeachers[editIndex] = formData;
-      setTeachers(updatedTeachers);
-      setEditIndex(null);
-    } else {
-      // Add
-      setTeachers([...teachers, formData]);
+  console.log(formData)
+
+  try {
+    const url =
+      editIndex !== null
+        ? `${import.meta.env.VITE_DOMAIN}/hod/update/teacher/${teachers[editIndex].id}`
+        : `${import.meta.env.VITE_DOMAIN}/hod/add/teacher`;
+
+    const method = editIndex !== null ? "PATCH" : "POST";
+
+    let response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        email:formData.email,
+        password:formData.password,
+        name:formData.name,
+        gender:formData.gender,
+        mobile_number:formData.number
+
+      }),
+    });
+
+    let data = await response.json();
+
+    if (!response.ok) {
+      return alert(data.message || "Something went wrong");
     }
 
-    // Reset Form
+    // 🔥 Refresh list from DB
+    read_teacher();
+
+    // Reset
     setFormData({
       email: "",
       password: "",
       name: "",
       number: "",
-      gender: "male",
+      gender: "",
     });
-  };
+
+    setEditIndex(null);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
   // ✅ Delete Teacher
-  const handleDelete = (index) => {
-    const filtered = teachers.filter((_, i) => i !== index);
-    setTeachers(filtered);
+  const handleDelete = async(index) => {
+    try {
+      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/${teachers[index].id}`,{
+        method:"DELETE",
+         headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      })
+
+      if(!response.ok){
+        return console.log("data not deleted from teacher list ")
+      }
+
+      console.log("data have deleted successfully")
+      
+      read_teacher()
+    } catch (error) {
+      
+    }
   };
 
   // ✅ Edit Teacher
-  const handleEdit = (index) => {
-    setFormData(teachers[index]);
-    setEditIndex(index);
-  };
+ const handleEdit = (index) => {
+  const teacher = teachers[index];
+
+  setFormData({
+    email: teacher.email,
+    password: "", // password kabhi DB se fill nahi karte
+    name: teacher.name,
+    number: teacher.mobile_number,
+    gender: teacher.gender,
+  });
+
+  setEditIndex(index);
+};
+
+
+
+
 
   return (
     <div className="w-full h-full bg-slate-100">
@@ -79,7 +167,6 @@ export const Crud_teacher = () => {
         {/* ================= FORM ================= */}
         <div className="bg-white flex justify-center items-center shadow rounded-2xl">
           <form
-            onSubmit={handleSubmit}
             className="flex bg-white shadow rounded-2xl p-6 flex-col gap-5 w-[80%]"
           >
             <Text_input
@@ -87,7 +174,7 @@ export const Crud_teacher = () => {
               name="email"
               type="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={(value)=>setFormData((pre)=>({...pre,email:value}))}
               lbname="email"
               lbval={<LuAtSign />}
             />
@@ -97,7 +184,7 @@ export const Crud_teacher = () => {
               name="password"
               type="password"
               value={formData.password}
-              onChange={handleChange}
+              onChange={(value)=>setFormData((pre)=>({...pre,password:value}))}
               lbname="password"
               lbval={<LuLock />}
             />
@@ -107,7 +194,7 @@ export const Crud_teacher = () => {
               name="name"
               type="text"
               value={formData.name}
-              onChange={handleChange}
+              onChange={(value)=>setFormData((pre)=>({...pre,name:value}))}
               lbname="name"
               lbval={<LuUserRound />}
             />
@@ -117,7 +204,7 @@ export const Crud_teacher = () => {
               name="number"
               type="number"
               value={formData.number}
-              onChange={handleChange}
+              onChange={(value)=>setFormData((pre)=>({...pre,number:value}))}
               lbname="number"
               lbval={<SlPhone />}
             />
@@ -129,26 +216,26 @@ export const Crud_teacher = () => {
               <select
                 name="gender"
                 value={formData.gender}
-                onChange={handleChange}
+                onChange={(e)=>setFormData((prev)=>({...prev,gender:e.target.value}))}
                 className="outline-orange-500 border rounded-xl p-2 font-semibold"
               >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
                 <option value="other">Other</option>
               </select>
             </div>
 
-            <Ok_button text={editIndex !== null ? "Update" : "Add"} />
+            <Ok_button onClick={handleSubmit} text={editIndex !== null ? "Update" : "Add"} />
           </form>
         </div>
 
         {/* ================= LIST ================= */}
-        <div className="bg-white flex flex-col gap-5 h-full p-5 rounded-2xl">
+        <div className="bg-white flex flex-col gap-5 h-full overflow-y-scroll     p-5 rounded-2xl">
           <div className="bg-white shadow rounded-2xl p-4">
             <h1 className="text-xl font-semibold">Teacher List</h1>
           </div>
 
-          <div className="w-full h-full overflow-y-auto flex flex-col gap-4">
+          <div className="w-full flex bg-white  flex-col gap-4">
             {teachers.length === 0 && (
               <p className="text-gray-400 text-center">No Teachers Added</p>
             )}
@@ -165,11 +252,9 @@ export const Crud_teacher = () => {
                   <h2 className="flex items-center gap-2">
                     <LuAtSign /> {teacher.email}
                   </h2>
+              
                   <h2 className="flex items-center gap-2">
-                    <SlLock /> {teacher.password}
-                  </h2>
-                  <h2 className="flex items-center gap-2">
-                    <LuPhone /> {teacher.number}
+                    <LuPhone /> {teacher.mobile_number}
                   </h2>
                   <h2>Gender: {teacher.gender}</h2>
                 </div>

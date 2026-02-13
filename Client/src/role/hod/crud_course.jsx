@@ -4,89 +4,71 @@ import { LuAtSign, LuSearch } from "react-icons/lu";
 import Text_input from "../../component/inputfiled";
 import Ok_button, { Cancel_button, Delete_button } from "../../component/buttons";
 
-export const Crud_course = ({course_data=[] , reload}) => {
+export const Crud_course = ({course_data , reload}) => {
 
     
-  // ✅ Form State
-  const [courseName, setCourseName] = useState("");
-
-  // ✅ Course List
+   const [courseName, setCourseName] = useState("");
   const [courses, setCourses] = useState([]);
-
-  // ✅ Update Mode
   const [editIndex, setEditIndex] = useState(null);
-
-  // ✅ Search
   const [search, setSearch] = useState("");
 
-  const [ filteredCourses , set_filteredCourses] = useState([])
-
-useEffect(()=>{
-    setCourses(course_data.coursecourses_datas)
-   console.log("Course List",course_data.coursecourses_datas)
-},[])
-
-
-console.log(get)
-//   API call
-
-
-
-//   submit data 
+  useEffect(() => {
+    setCourses(course_data);
+  }, [course_data]);
+console.log("Curses" , )
+  const filteredCourses = courses.filter((course) =>
+    course?.name?.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const token = localStorage.getItem("token");  // 🔥 yahan lo
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  if (!token) {
-    console.log("No token found, login required");
-    return;
-  }
+    try {
+      let url = `${import.meta.env.VITE_DOMAIN}/hod/add/course`;
+      let method = "POST";
 
-  try {
-    const response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/add/course`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,   // 👈 MUST Bearer
-      },
-      body: JSON.stringify({ courseName }),
-    });
+      if (editIndex !== null) {
+        const courseId = courses[editIndex].id;
+        url = `${import.meta.env.VITE_DOMAIN}/hod/update/course/${courseId}`;
+        method = "PATCH";
+      }
 
-    if (!response.ok) {
-      console.log("data not pushed", response.status);
-      return;
+      await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ course_name: courseName }),
+      });
+
+      setCourseName("");
+      setEditIndex(null);
+      reload();
+    } catch (error) {
+      console.log(error);
     }
-
-    const data = await response.json();
-    console.log("data submitted", data);
-
-    setCourseName("");
-
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-
-  const handleDelete = (index) => {
-    const filtered = courses.filter((_, i) => i !== index);
-    setCourses(filtered);
   };
 
   const handleEdit = (index) => {
-    setCourseName(courses[index]);
+    setCourseName(courses[index].name);
     setEditIndex(index);
   };
-  
-  useEffect(()=>{
-const data = courses.filter((course) =>
-    course.name.toLowerCase().includes(search.toLowerCase()))
-set_filteredCourses(data)
-  },[search])
-    
 
+  const handleDelete = async (index) => {
+    const token = localStorage.getItem("token");
+    const courseId = courses[index].id;
+
+    await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/course/${courseId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    reload();
+  };
   
   ;
 
@@ -136,7 +118,7 @@ set_filteredCourses(data)
           </div>
 
           {/* Course List */}
-          <div className="w-full h-full overflow-y-auto flex flex-col gap-4">
+          <div className="w-full h-95 overflow-y-scroll flex flex-col gap-4">
             {filteredCourses.length === 0 && (
               <p className="text-center text-gray-400">No Course Found</p>
             )}

@@ -51,43 +51,55 @@ export const profile = async (req, res) => {
 }
 
 export const add_teacher = async (req, res) => {
+  let { email, password, name, gender, mobile_number } = req.body;
 
-    let { email, password, name, gender, mobile_number } = req.body
-    try {
-
-
-
-
-        if (!email || !password || !name || !gender || !mobile_number) {
-            return res.send(" all field required for adding teacher ")
-        }
-
-        let salt = 10
-        let get_salt_round = await bcrypt.genSalt(salt)
-        let salted_password = await bcrypt.hash(password, get_salt_round)
-
-
-        let hod_id = req.user?.id
-
-        if (!hod_id) {
-            return res.send("hod id not found here")
-        }
-
-
-        let slq = `
-        INSERT INTO teacher_db(email,password,name,gender,mobile_number,hod_id) VALUES(?,?,?,?,?,?)
-        `
-        await pool.query(slq, [email, salted_password, name, gender, mobile_number, hod_id])
-
-        return res.send("teacher data have submitted")
-
-
-    } catch (error) {
-
+  try {
+    if (!email || !password || !name || !gender || !mobile_number) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
     }
 
+    let hod_id = req.user?.id;
 
-}
+    if (!hod_id) {
+      return res.status(401).json({
+        success: false,
+        message: "HOD not authorized",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    let sql = `
+      INSERT INTO teacher_db(email,password,name,gender,mobile_number,hod_id)
+      VALUES(?,?,?,?,?,?)
+    `;
+
+    await pool.query(sql, [
+      email,
+      hashedPassword,
+      name,
+      gender,
+      mobile_number,
+      hod_id,
+    ]);
+
+    return res.status(201).json({
+      success: true,
+      message: "Teacher added successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 
 
 export const update_teacher = async (req, res) => {
@@ -247,38 +259,51 @@ export const read_teacher = async (req, res) => {
 
 export const add_student = async (req, res) => {
 
-    let {
-        name,
-        roll_no,
-        class_id
-    } = req.body
+    let { email, password, name, roll_no, class_id } = req.body;
 
-    if (!name || !roll_no || !class_id) {
-
-        return res.status(401).json({
-            message: "all field are required "
-        })
+    if (!name || !roll_no || !class_id || !email || !password) {
+        return res.status(400).json({
+            message: "All fields are required"
+        });
     }
-
-    let sql = `
-    INSERT INTO student_db(name,roll_no,class_id) VALUES(?,?,?)
-    `
 
     try {
 
-        let [result] = await pool.query(sql, [name, roll_no, class_id])
+        // 🔐 hash password
+        
+        let sql = `
+        INSERT INTO student_db(email,password,name,roll_no,class_id)
+        VALUES(?,?,?,?,?)
+        `;
+
+        let [result] = await pool.query(sql, [
+            email,
+            password,
+            name,
+            roll_no,
+            class_id
+        ]);
 
         return res.status(200).json({
-            message: "student added successfully",
+            message: "Student added successfully",
             result
-        })
+        });
+
     } catch (error) {
+
+        // duplicate email handle (UNIQUE constraint)
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                message: "Email already exists"
+            });
+        }
+
         return res.status(500).json({
-            message: "add student error",
+            message: "Add student error",
             error
-        })
+        });
     }
-}
+};
 export const update_student = async (req, res) => {
     let student_id = req.params?.id
     let {
@@ -726,7 +751,7 @@ export const delete_subject = async (req, res) => {
         WHERE hod_id = ? AND id = ?
         `
 
-        let [data] = await pool.sql(sql, [hod_id, subject_id])
+let [data] = await pool.query(sql, [hod_id, subject_id])
 
         return res.status(200).json({
             message: "subject delete successfully",
@@ -1141,6 +1166,112 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
     }
 
 }
+
+export const  filter_read_student =async(req,res)=>{
+
+    let hod_id = req.user?.id
+    try {
+        
+        let sql = `
+SELECT 
+FROM student_db a
+JOIN teacher_db t ON t.id = a.teacher_id
+
+
+WHERE h-id = ?
+
+        `
+
+
+        let [result] = await pool.query(sql,[hod_id])
+
+        return res.json({
+            message:"data founded ",
+            result
+        })
+    } catch (error) {
+        return res.json({
+            message:"data not found here ",
+            error
+        })
+    }
+
+}
+
+export const get_student_report = async (req, res) => {
+    const { roll_no, class_id, course_id } = req.query;
+
+    if (!roll_no || !class_id || !course_id) {
+        return res.status(400).json({
+            message: "roll_no, class_id, course_id required"
+        });
+    }
+
+    try {
+
+        // ✅ Get student basic info
+        const studentSql = `
+            SELECT id, name, roll_no
+            FROM student_db
+            WHERE roll_no = ? AND class_id = ? AND course_id = ?
+        `;
+
+        const [student] = await pool.query(studentSql, [roll_no, class_id, course_id]);
+
+        if (student.length === 0) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        const student_id = student[0].id;
+
+        // ✅ Overall Attendance
+        const overallSql = `
+            SELECT 
+                COUNT(*) AS total_lectures,
+                SUM(CASE WHEN status='P' THEN 1 ELSE 0 END) AS present,
+                ROUND(
+                    (SUM(CASE WHEN status='P' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
+                    2
+                ) AS percentage
+            FROM att_db
+            WHERE student_id = ?
+        `;
+
+        const [overall] = await pool.query(overallSql, [student_id]);
+
+        // ✅ Subject-wise Attendance
+        const subjectSql = `
+            SELECT 
+                sb.subject,
+                COUNT(a.id) AS total_lectures,
+                SUM(CASE WHEN a.status='P' THEN 1 ELSE 0 END) AS present,
+                ROUND(
+                    (SUM(CASE WHEN a.status='P' THEN 1 ELSE 0 END) / COUNT(a.id)) * 100,
+                    2
+                ) AS percentage
+            FROM att_db a
+            JOIN subject_db sb ON sb.id = a.subject_id
+            WHERE a.student_id = ?
+            GROUP BY a.subject_id
+        `;
+
+        const [subjects] = await pool.query(subjectSql, [student_id]);
+
+        return res.status(200).json({
+            message: "Report generated",
+            student: student[0],
+            overall: overall[0],
+            subjects
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error generating report",
+            error
+        });
+    }
+};
+
 
 // Can see particular student by class name
 

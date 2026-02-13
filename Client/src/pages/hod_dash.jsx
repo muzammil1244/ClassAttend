@@ -480,7 +480,7 @@ const open_course_fun = () =>{
 
                 {
                     open_student && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
-                        <Crud_Student />
+                        <Crud_Student course={get_courses} classes={get_classes} />
                     </div>
                 }
 
