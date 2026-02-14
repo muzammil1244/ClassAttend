@@ -25,6 +25,7 @@ hod_route.patch("/update/student/:id", update_student)
 hod_route.delete("/delete/student/:id", delete_student)
 hod_route.get("/read/student", read_student)
 hod_route.get("/filter/student",filter_read_student)
+hod_route.get("/student/report",get_student_report)
 // CRUD OPERATION OF COURSES
 hod_route.post("/add/course", add_courses)
 hod_route.patch("/update/course/:id", update_courses)
