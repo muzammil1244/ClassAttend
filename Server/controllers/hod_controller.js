@@ -558,41 +558,54 @@ SELECT * FROM course_db WHERE hod_id = ?
 
 export const add_classes = async (req, res) => {
 
-    let course_id = req.params?.id
-    let {
-        class_name,
-        class_year
-    } = req.body
-
+    const course_id = req.params?.id;
+    const { class_name, class_year } = req.body;
 
     try {
 
-        if (!course_id) {
-            return res.status(401).json({
-                message: "course id not found "
-            })
+        if (!course_id || !class_name || !class_year) {
+            return res.status(400).json({
+                message: "All fields are required"
+            });
         }
-        let sql = `
-INSERT INTO classes_db(class_name,class_year,course_id) VALUES(?,?,?)
-`
 
-        let [result] = await pool.query(sql, [class_name, class_year, course_id])
+        /* ---------- INSERT ---------- */
+        const insertSql = `
+            INSERT INTO classes_db (class_name, class_year, course_id)
+            VALUES (?, ?, ?)
+        `;
 
-        return res.status(200).json({
-            message: "data collected",
-            data: result[0]
-        })
+        const [insertResult] = await pool.query(insertSql, [
+            class_name,
+            class_year,
+            course_id
+        ]);
+
+        /* ---------- GET INSERTED ID ---------- */
+        const insertedId = insertResult.insertId;
+
+        /* ---------- FETCH FULL ROW ---------- */
+        const selectSql = `
+            SELECT * FROM classes_db WHERE id = ?
+        `;
+
+        const [rows] = await pool.query(selectSql, [insertedId]);
+
+        /* ---------- RETURN CREATED DATA ---------- */
+        return res.status(201).json({
+            message: "Class created successfully",
+            data: rows[0]   // 🔥 FULL OBJECT WITH ID
+        });
 
     } catch (error) {
 
         return res.status(500).json({
-            message: "error from hod add classes",
-            error
-        })
+            message: "Error adding class",
+            error: error.message
+        });
     }
+};
 
-
-}
 export const update_classes = async (req, res) => {
 
     let update_course_id = req.params?.id
@@ -669,13 +682,14 @@ export const read_classes = async (req, res) => {
         }
 
         let sql = `
-SELECT cl.* 
+SELECT cl.* ,c.name
 FROM classes_db as cl
 JOIN course_db c 
-ON cl.course_id = c.id
+ON c.id = cl.course_id 
 WHERE c.hod_id = ? AND  c.id= ?
 
 `
+
 
         let [result] = await pool.query(sql, [hod_id, course_id])
 
@@ -1182,7 +1196,7 @@ export const filter_read_student = async (req, res) => {
     try {
 
         let sql = `
-        SELECT a.id AS student_id, a.name , a.email , a.roll_no , cs.id AS class_id  , c.id As course_id
+         SELECT a.*  , cs.id AS class_id  , c.id As course_id
         FROM student_db a
         JOIN class_subject_db cs ON cs.id = a.class_id
         JOIN classes_db cl ON cl.id = cs.class_id
@@ -1298,6 +1312,39 @@ export const get_student_report = async (req, res) => {
         return res.status(500).json({
             message: "Error generating report",
             error
+        });
+    }
+};
+
+
+export const get_students_by_class = async (req, res) => {
+    try {
+        const hod_id = req.user?.id;          // token se
+        const class_id = req.params?.class;
+
+        if (!hod_id || !class_id) {
+            return res.status(400).json({
+                message: "HOD id and Class id required"
+            });
+        }
+
+      let sql = `
+      SELECT *
+      FROM student_db s
+      WHERE s.class_id = ?
+      `
+
+      let [result] = await pool.query(sql,[class_id])
+
+        return res.status(200).json({
+            message: "Students fetched successfully",
+           result
+        });
+
+    } catch (error) {
+        console.log("Fetch students error:", error);
+        return res.status(500).json({
+            message: "Internal server error"
         });
     }
 };

@@ -486,7 +486,7 @@ const open_course_fun = () =>{
 
                 {
                     open_classes && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
-                        <Create_Classes />
+                        <Crud_classes  />
                     </div>
                 }
 {/* Subject */}

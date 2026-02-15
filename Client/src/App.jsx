@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { Routes, Route } from 'react-router-dom'
 import { Hod_dash } from './pages/hod_dash'
 import { Loging } from './pages/login'
+import { Create_Classes } from './role/hod/create_class'
 function App() {
 
   return (

@@ -2,7 +2,7 @@ import express from "express"
 import {
         add_classes, add_courses, add_student, add_subject, add_teacher,
         add_teacher_to_subject_and_class, can_see_particular_class_student, delete_classes, delete_courses, delete_student,
-        delete_subject, delete_teacher, download_attendance, filter_read_student, get_student_report, profile, read_classes, read_courses,
+        delete_subject, delete_teacher, download_attendance, filter_read_student, get_student_report, get_students_by_class, profile, read_classes, read_courses,
         read_student, read_subject, read_teacher, see_particular_class, see_particular_course,
         see_particular_day_att,
         see_particular_student, see_particular_subject, show_all_attendance,
@@ -26,6 +26,7 @@ hod_route.delete("/delete/student/:id", delete_student)
 hod_route.get("/read/student", read_student)
 hod_route.get("/filter/student",filter_read_student)
 hod_route.get("/student/report",get_student_report)
+hod_route.get("/student/:class/data",get_students_by_class)
 // CRUD OPERATION OF COURSES
 hod_route.post("/add/course", add_courses)
 hod_route.patch("/update/course/:id", update_courses)

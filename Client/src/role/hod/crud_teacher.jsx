@@ -8,13 +8,13 @@ import Ok_button, { Delete_button } from "../../component/buttons";
 export const Crud_teacher = () => {
   // ✅ Form State
   const [formData, setFormData] = useState({
-    
-      email: "",
-      password: "",
-      name: "",
-      number: "",
-      gender: "",
-    
+
+    email: "",
+    password: "",
+    name: "",
+    number: "",
+    gender: "",
+
   });
 
   // ✅ Teachers List
@@ -24,131 +24,130 @@ export const Crud_teacher = () => {
   const [editIndex, setEditIndex] = useState(null);
 
 
-// api call
+  // api call
 
-let token = localStorage.getItem("token")
+  let token = localStorage.getItem("token")
 
-const read_teacher=async()=>{
-try {
+  const read_teacher = async () => {
+    try {
 
-  let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/teacher`,{
-    method:"GET",
-    headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/teacher`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+      )
+      let data = await response.json()
+
+      if (!response.ok) {
+        return console.log("response err", response)
+      }
+      setTeachers(data.data)
+      console.log("teacher list", data)
+    } catch (error) {
+      return console.log(error)
+    }
   }
-  )
-  let data = await response.json()
-
-  if(!response.ok){
-    return console.log("response err",response)
-  }
-  setTeachers(data.data)
-  console.log("teacher list", data)
-} catch (error) {
-  return console.log(error)
-}
-}
 
 
-useEffect(()=>{
-read_teacher()
-},[])
-
+  useEffect(() => {
+    read_teacher()
+  }, [])
   // ✅ Handle Input Change
- 
+
 
   // ✅ Add / Update Teacher
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  console.log(formData)
+    console.log(formData)
 
-  try {
-    const url =
-      editIndex !== null
-        ? `${import.meta.env.VITE_DOMAIN}/hod/update/teacher/${teachers[editIndex].id}`
-        : `${import.meta.env.VITE_DOMAIN}/hod/add/teacher`;
+    try {
+      const url =
+        editIndex !== null
+          ? `${import.meta.env.VITE_DOMAIN}/hod/update/teacher/${teachers[editIndex].id}`
+          : `${import.meta.env.VITE_DOMAIN}/hod/add/teacher`;
 
-    const method = editIndex !== null ? "PATCH" : "POST";
+      const method = editIndex !== null ? "PATCH" : "POST";
 
-    let response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        email:formData.email,
-        password:formData.password,
-        name:formData.name,
-        gender:formData.gender,
-        mobile_number:formData.number
+      let response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          gender: formData.gender,
+          mobile_number: formData.number
 
-      }),
-    });
+        }),
+      });
 
-    let data = await response.json();
+      let data = await response.json();
 
-    if (!response.ok) {
-      return alert(data.message || "Something went wrong");
+      if (!response.ok) {
+        return alert(data.message || "Something went wrong");
+      }
+
+      // 🔥 Refresh list from DB
+      read_teacher();
+
+      // Reset
+      setFormData({
+        email: "",
+        password: "",
+        name: "",
+        number: "",
+        gender: "",
+      });
+
+      setEditIndex(null);
+    } catch (error) {
+      console.log(error);
     }
-
-    // 🔥 Refresh list from DB
-    read_teacher();
-
-    // Reset
-    setFormData({
-      email: "",
-      password: "",
-      name: "",
-      number: "",
-      gender: "",
-    });
-
-    setEditIndex(null);
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
 
   // ✅ Delete Teacher
-  const handleDelete = async(index) => {
+  const handleDelete = async (index) => {
     try {
-      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/${teachers[index].id}`,{
-        method:"DELETE",
-         headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/${teachers[index].id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
 
-      if(!response.ok){
+      if (!response.ok) {
         return console.log("data not deleted from teacher list ")
       }
 
       console.log("data have deleted successfully")
-      
+
       read_teacher()
     } catch (error) {
-      
+
     }
   };
 
   // ✅ Edit Teacher
- const handleEdit = (index) => {
-  const teacher = teachers[index];
+  const handleEdit = (index) => {
+    const teacher = teachers[index];
 
-  setFormData({
-    email: teacher.email,
-    password: "", // password kabhi DB se fill nahi karte
-    name: teacher.name,
-    number: teacher.mobile_number,
-    gender: teacher.gender,
-  });
+    setFormData({
+      email: teacher.email,
+      password: "", // password kabhi DB se fill nahi karte
+      name: teacher.name,
+      number: teacher.mobile_number,
+      gender: teacher.gender,
+    });
 
-  setEditIndex(index);
-};
+    setEditIndex(index);
+  };
 
 
 
@@ -174,7 +173,7 @@ read_teacher()
               name="email"
               type="email"
               value={formData.email}
-              onChange={(value)=>setFormData((pre)=>({...pre,email:value}))}
+              onChange={(value) => setFormData((pre) => ({ ...pre, email: value }))}
               lbname="email"
               lbval={<LuAtSign />}
             />
@@ -184,7 +183,7 @@ read_teacher()
               name="password"
               type="password"
               value={formData.password}
-              onChange={(value)=>setFormData((pre)=>({...pre,password:value}))}
+              onChange={(value) => setFormData((pre) => ({ ...pre, password: value }))}
               lbname="password"
               lbval={<LuLock />}
             />
@@ -194,7 +193,7 @@ read_teacher()
               name="name"
               type="text"
               value={formData.name}
-              onChange={(value)=>setFormData((pre)=>({...pre,name:value}))}
+              onChange={(value) => setFormData((pre) => ({ ...pre, name: value }))}
               lbname="name"
               lbval={<LuUserRound />}
             />
@@ -204,7 +203,7 @@ read_teacher()
               name="number"
               type="number"
               value={formData.number}
-              onChange={(value)=>setFormData((pre)=>({...pre,number:value}))}
+              onChange={(value) => setFormData((pre) => ({ ...pre, number: value }))}
               lbname="number"
               lbval={<SlPhone />}
             />
@@ -216,12 +215,15 @@ read_teacher()
               <select
                 name="gender"
                 value={formData.gender}
-                onChange={(e)=>setFormData((prev)=>({...prev,gender:e.target.value}))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, gender: e.target.value }))}
                 className="outline-orange-500 border rounded-xl p-2 font-semibold"
               >
+
+                <option value="">Select Gender</option>
                 <option value="M">Male</option>
                 <option value="F">Female</option>
                 <option value="other">Other</option>
+
               </select>
             </div>
 
@@ -252,7 +254,7 @@ read_teacher()
                   <h2 className="flex items-center gap-2">
                     <LuAtSign /> {teacher.email}
                   </h2>
-              
+
                   <h2 className="flex items-center gap-2">
                     <LuPhone /> {teacher.mobile_number}
                   </h2>
