@@ -97,6 +97,12 @@ const [open_course,set_open_course] = useState(false)
 
 
     const class_score = async (Class_id) => {
+if(!get_courseId_date.date){
+  alert("Please select date to see class score")
+ 
+  return false
+}
+      console.log(Class_id,"class data ",get_courseId_date.course,get_courseId_date.date)
     try {
         const headers = {
             "Content-Type": "application/json",
@@ -316,7 +322,7 @@ const open_course_fun = () =>{
                 {/* HOME */}
 
                 {
-                    open_home && <div className="col-span-4 h-full w-full rounded-3xl bg-gradient-to-br from-slate-100 to-slate-200 p-6 overflow-y-auto">
+                    open_home && <div className="col-span-4 h-full w-full rounded-3xl bg-white p-6 overflow-y-auto">
 
   {/* ===== Header ===== */}
   <div className="mb-6 flex items-center justify-between rounded-3xl bg-white p-5 shadow-md">
@@ -376,12 +382,11 @@ const open_course_fun = () =>{
 
     {/* Present / Total */}
     <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 px-6 py-5">
-      <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
+      <div className="flex  items-center gap-2 text-sm font-bold text-green-600">
         <LuUsersRound />
         Present: {get_course_score.present_student || 0}
       </div>
-
-      <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
+      <div className="flex items-center gap-2 text-sm font-bold text-blue-600">
         <LuUsersRound />
         Total: {get_course_score.total_student || 0}
       </div>
@@ -391,8 +396,8 @@ const open_course_fun = () =>{
   {/* ===== Class & Subject Section ===== */}
   <div className="mt-6 rounded-3xl bg-white p-6 shadow-md">
 
-    <p className="mb-5 text-sm text-gray-500">
-      👉 First select a course, then view class and subject-wise attendance.
+    <p className="mb-5 text-sm font-bold text-gray-500">
+       First select a course, then view class and subject-wise attendance.
     </p>
 
     {/* Class Selector */}
@@ -430,11 +435,11 @@ const open_course_fun = () =>{
         <h1 className="text-center text-gray-600 font-semibold">
           Details
         </h1>
-        <h1 className="flex gap-2 items-center justify-center">
-          <LuUsersRound /> Total: {get_class_score.total_student}
+        <h1 className="mb-5 text-sm font-bold text-gray-500 flex gap-3 items-center justify-center">
+          <LuUsersRound /> total: {get_class_score.total_student}
         </h1>
-        <h1 className="flex gap-2 items-center justify-center">
-          <LuUsersRound /> Present: {get_class_score.present_student}
+        <h1 className="mb-5 text-sm font-bold text-gray-500 flex gap-3 items-center justify-center">
+          <LuUsersRound /> present: {get_class_score.present_student}
         </h1>
       </div>
     </div>
@@ -456,8 +461,8 @@ const open_course_fun = () =>{
               <h1 className="flex items-center gap-2 text-sm">
                 <SlUser /> {item.name}
               </h1>
-              <p className="text-sm">Total: {item.total_students}</p>
-              <p className="text-sm">Present: {item.present_students}</p>
+              <p className="text-sm">total: {item.total_students}</p>
+              <p className="text-sm">present: {item.present_students}</p>
             </div>
           </div>
         ))}

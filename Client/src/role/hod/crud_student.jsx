@@ -7,11 +7,11 @@ import CircleProgress from "../../component/circle_progress"
 
 export const Crud_Student = ({course}) => {
 
-const [get_courses,set_courses] = useState(course.length?course:[])
+const [get_courses,set_courses] = useState([])
 const [get_classes,set_classes] = useState([])
 
-const [selectedCourse,setSelectedCourse] = useState("")
-const [selectedClass,setSelectedClass] = useState("")
+const [selectedCourse,setSelectedCourse] = useState({})
+const [selectedClass,setSelectedClass] = useState(null)
 const [students,setStudents] = useState([])
 const [searchText,setSearchText] = useState("")
 
@@ -26,6 +26,8 @@ let token = localStorage.getItem("token")
         alert("Please select course and class first")
         return
     }
+
+    console.log("fetching report for ",item)
 
     try{
         setLoadingReport(true)
@@ -55,12 +57,13 @@ let token = localStorage.getItem("token")
 
 
   const read_classes = async () => {
-        if (get_courses.course > 0) {
-            console.log("course id not found ", get_courses)
+
+        if (!selectedCourse) {
+            console.log("course id not found ", selectedCourse)
             return false
         }
         try {
-            const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/class/${get_courses[0].id}`, {
+            const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/class/${selectedCourse}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,8 +71,8 @@ let token = localStorage.getItem("token")
                 }
             })
             const data = await react.json()
-            console.log("classes", data.data)
             set_classes(data.data)
+            console.log("classes for course", data)
         } catch (error) {
             return console.log(error)
         }
@@ -78,6 +81,7 @@ let token = localStorage.getItem("token")
  const searchStudents = async () => {
     try {
 
+        console.log("searching students with ",{selectedCourse,selectedClass,searchText})
         const params = new URLSearchParams()
 
         if(selectedCourse){
@@ -122,6 +126,9 @@ useEffect(()=>{
 
  useEffect(
         ()=>{
+            set_courses(course)
+            console.log("courses for student",course)
+
             searchStudents()
             console.log("data founded",get_courses)
         
@@ -130,7 +137,12 @@ useEffect(()=>{
     useEffect(
         ()=>{
             read_classes()
-            console.log("data founded",get_courses)},[])
+            console.log("data founded",get_courses)},[course])
+
+            useEffect(()=>{
+                read_classes()
+                console.log("selected course",selectedCourse)
+            },[selectedCourse])
     return (
 
         <div className="w-full p-4 h-full overflow-y-hidden rounded-2xl  bg-white ">
@@ -157,7 +169,7 @@ onChange={(e)=>setSearchText(e.target.value)}
 <option value="">select course</option>
 {
     get_courses.length&&get_courses.map((item,index)=>(
-<option key={index} value={item.id}>{item.name}</option>
+<option key={index}  value={item.id}>{item.name}</option>
     ))
 }
 

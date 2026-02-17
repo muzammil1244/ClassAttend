@@ -84,6 +84,8 @@ const [select_class_id,setSelect_class_id] = useState({})
     },[])
 return (
 <div className="w-full rounded-2xl bg-gray-100 h-full">
+
+    
 {!open_manage_class &&<div>
     {/* Header */}
 <div className="w-full items-center py-4 px-10 flex justify-between bg-white shadow">

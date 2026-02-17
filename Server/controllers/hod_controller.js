@@ -305,52 +305,81 @@ export const add_student = async (req, res) => {
     }
 };
 export const update_student = async (req, res) => {
-    let student_id = req.params?.id
-    let {
-        name,
-        roll_no,
-        class_id
-    } = req.body
 
-    if (!name || !roll_no || !class_id) {
+    const student_id = req.params.id;
 
-        return res.status(401).json({
-            message: "all field are required "
-        })
+    let { email, password, name, roll_no, class_id } = req.body;
+
+    // ✅ same validation like add_student
+    if (!student_id || !name || !roll_no || !class_id || !email) {
+        return res.status(400).json({
+            message: "All fields are required"
+        });
     }
+
     try {
 
+        // ✅ check student exists
+        const [check] = await pool.query(
+            `SELECT * FROM student_db WHERE id = ?`,
+            [student_id]
+        );
 
-        let sql = `
-    UPDATE student_db
-    SET name =?,
-      roll_no =?,
-    class_id =?
+        if (check.length === 0) {
+            return res.status(404).json({
+                message: "Student not found"
+            });
+        }
 
-    WHERE id = ?
+        // ✅ if password sent → update password
+        // ❗ if password empty → keep old password
+        let sql;
+        let values;
 
-    `
+        if (password && password.trim() !== "") {
 
-        let [result] = await pool.query(sql, [name, roll_no, class_id, student_id])
+            sql = `
+                UPDATE student_db
+                SET email = ?, password = ?, name = ?, roll_no = ?, class_id = ?
+                WHERE id = ?
+            `;
 
-        return res.status(401).json({
-            message: "student updated successfully",
-            data: result
-        })
+            values = [email, password, name, roll_no, class_id, student_id];
+
+        } else {
+
+            sql = `
+                UPDATE student_db
+                SET email = ?, name = ?, roll_no = ?, class_id = ?
+                WHERE id = ?
+            `;
+
+            values = [email, name, roll_no, class_id, student_id];
+        }
+
+        let [result] = await pool.query(sql, values);
+
+        return res.status(200).json({
+            message: "Student updated successfully",
+            result
+        });
 
     } catch (error) {
 
+        // ✅ duplicate email handle (same as add)
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                message: "Email already exists"
+            });
+        }
+
         return res.status(500).json({
-            message: "student read error",
-            error
-        })
-
+            message: "Update student error",
+            error: error.message
+        });
     }
+};
 
-
-
-
-}
 
 export const delete_student = async (req, res) => {
 
@@ -820,61 +849,118 @@ export const read_subject = async (req, res) => {
 // ADDITIONAL FEATURE OF HOD
 
 export const add_teacher_to_subject_and_class = async (req, res) => {
+    const assignments = req.body; // expecting array
 
-    let { classes, subject, teacher } = req.body
+    if (!Array.isArray(assignments) || assignments.length === 0) {
+        return res.status(400).json({
+            message: "Assignments array required"
+        });
+    }
 
-    let sql = `
-    INSERT INTO class_subject_db(class_id,subject_id,teacher_id) VALUES(?,?,?)
-    `
     try {
+        // Prepare values for bulk insert
+        const values = assignments.map(item => [
+            item.class_id,
+            item.subject_id,
+            item.teacher_id
+        ]);
 
-        let [data] = await pool.query(sql, [classes, subject, teacher])
+        const sql = `
+            INSERT INTO class_subject_db (class_id, subject_id, teacher_id)
+            VALUES ?
+        `;
+
+        const [data] = await pool.query(sql, [values]);
 
         return res.status(200).json({
-            message: " add teacher classes and subjects successfully",
-            data: data
-        })
+            message: "Teachers + Subjects assigned successfully",
+            insertedRows: data.affectedRows
+        });
+
     } catch (error) {
         return res.status(500).json({
-            message: "add class ans subject to teacher errr",
+            message: "Bulk insert error",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+export const delete_teacher_subject_assign = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const sql = `
+        DELETE FROM class_subject_db
+
+        WHERE class_id = ?
+        `;
+
+        const [data] = await pool.query(sql, [id]);
+        return res.status(200).json({
+            message: "Assignment deleted successfully",
+            data
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error deleting assignment",
             error
-        })
+
+        });
     }
-}
+};
 
 
-export const update_teacher_to_subject_and_class = async (req, res) => {
+export const get_teacher_subject_by_class = async (req, res) => {
+    const { class_id } = req.params;
 
-    let c_s_id = req.params?.id
-    let { classes, subject, teacher } = req.body
-    if (!classes || !subject || !teacher) {
-
-        return res.status(401).json({
-            message: "all field required",
-        })
+    if (!class_id) {
+        return res.status(400).json({
+            message: "class_id is required"
+        });
     }
+
     try {
 
-        let sql = `
-        UPDATE class_subject_db
-        SET class_id = ? , subject_id=? ,  teacher_id=?
-        WHERE id=?
-        `
-        let [data] = await pool.query(sql, [classes, subject, teacher, c_s_id])
+        const sql = `
+            SELECT 
+                cs.id,
+                cs.class_id,
+
+                s.id AS subject_id,
+                s.subject AS subject_name,
+
+                t.id AS teacher_id,
+                t.name AS teacher_name
+
+            FROM class_subject_db cs
+
+             JOIN subject_db s 
+                ON s.id = cs.subject_id 
+
+             JOIN teacher_db t 
+                ON t.id = cs.teacher_id
+
+            WHERE cs.class_id = ?
+            ORDER BY s.subject ASC 
+        `;
+
+        const [data] = await pool.query(sql, [class_id]);
 
         return res.status(200).json({
-            message: "update subject class teacher successfully",
+            message: "Data fetched successfully",
             data: data
-        })
+        });
+
     } catch (error) {
         return res.status(500).json({
-            message: " updata classes subject id error",
-            error
-        })
+            message: "Fetch error",
+            error: error.message
+        });
     }
+};
 
-
-}
 // showing all attendance of the 
 export const show_all_attendance = async (req, res) => {
     let hod_id = req.user?.id
@@ -1084,49 +1170,50 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 // Can see particular subject attendancely score status 
 
 export const see_particular_subject = async (req, res) => {
-    const course_id = req.params.course
-    const class_id = req.params?.class
-    const date = req.params?.date
-    const classId = Number(class_id)
-    const courseID = Number(course_id)
-    console.log(typeof (classId), classId, typeof (courseID), courseID, typeof (date), date)
+    const courseID = Number(req.params.course)
+    const classId = Number(req.params.class)
+    const date = req.params.date
+
     try {
+
         const sql = `
- SELECT
-           s.id AS subject_id,
-    s.subject,
-    t.id AS teacher_id,
-    t.name AS name,
+        SELECT
+            s.id AS subject_id,
+            s.subject,
+            t.id AS teacher_id,
+            t.name AS name,
 
-    COUNT(a.student_id) AS total_students,
-    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_students,
+            COUNT(a.student_id) AS total_students,
 
-    ROUND(
-        SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END)
-        / COUNT(a.student_id) * 100
-    ) AS percentage
-           
-        FROM att_db a
-        JOIN class_subject_db cs 
-          ON cs.id = a.class_id
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_students,
+
+            CASE 
+                WHEN COUNT(a.student_id) = 0 THEN 0
+                ELSE ROUND(
+                    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END)
+                    / COUNT(a.student_id) * 100
+                )
+            END AS percentage
+
+        FROM class_subject_db cs
         JOIN classes_db c ON c.id = cs.class_id
-        JOIN course_db cr 
-          ON cr.id = c.course_id
+        JOIN course_db cr ON cr.id = c.course_id
         JOIN subject_db s ON s.id = cs.subject_id
         JOIN teacher_db t ON t.id = cs.teacher_id
+
+        LEFT JOIN att_db a 
+            ON a.class_id = cs.id
+            AND a.att_date = ?
+
         WHERE cr.id = ?
-  AND c.id = ?
-  AND a.att_date = ?
- 
-GROUP BY 
-    s.id, s.subject, t.id, t.name;
+        AND c.id = ?
 
+        GROUP BY 
+            s.id, s.subject, t.id, t.name
+        `
 
-
-
- `
-
-        const [result] = await pool.query(sql, [courseID, classId, date])
+        // ✅ Correct order
+        const [result] = await pool.query(sql, [date, courseID, classId])
 
         return res.status(200).json({
             message: "subject wise attendance fetched successfully",
@@ -1134,13 +1221,13 @@ GROUP BY
         })
 
     } catch (err) {
-        console.log(err)
         return res.status(500).json({
             message: "error from reading subject wise score",
             error: err.message
         })
     }
 }
+
 
 // Can see particular student attendancely score status
 
@@ -1184,9 +1271,9 @@ SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
 export const filter_read_student = async (req, res) => {
 
     let hod_id = req.user?.id
-    let course_id = req.query?.course   // ?course=2
-    let class_id = req.query?.class    // ?class=5
-    let search = req.query?.search   // 👈 NEW
+    let course_id = req.query?.course  
+    let class_id = req.query?.class    
+    let search = req.query?.search   
 
     if (!hod_id) {
         console.log("hod id not found her e")
@@ -1196,19 +1283,27 @@ export const filter_read_student = async (req, res) => {
     try {
 
         let sql = `
-         SELECT a.*  , cs.id AS class_id  , c.id As course_id
-        FROM student_db a
-        JOIN class_subject_db cs ON cs.id = a.class_id
-        JOIN classes_db cl ON cl.id = cs.class_id
-        JOIN teacher_db t ON t.id = cs.teacher_id
-        JOIN course_db c ON c.id = cl.course_id
-        WHERE t.hod_id = ?
+        SELECT 
+    a.*,
+    cl.id AS class_id,
+    c.id AS course_id
+
+FROM student_db a
+
+JOIN classes_db cl ON cl.id = a.class_id
+JOIN course_db c ON c.id = cl.course_id
+
+-- HOD validation (important)
+JOIN class_subject_db cs ON cs.class_id = cl.id
+JOIN teacher_db t ON t.id = cs.teacher_id
+
+WHERE t.hod_id = ?
         `
 
         let values = [hod_id]
 
         if (class_id) {
-            sql += ` AND cs.id = ?`
+            sql += ` AND cl.id = ?`
             values.push(class_id)
         }
 
@@ -1218,9 +1313,9 @@ export const filter_read_student = async (req, res) => {
         }
 
         if (search && search.trim() !== "") {
-    sql += ` AND a.name LIKE ?`
-    values.push(`%${search.trim()}%`)
-}
+            sql += ` AND a.name LIKE ?`
+            values.push(`%${search.trim()}%`)
+        }
 
         sql += ` ORDER BY a.name ASC`
 
@@ -1255,7 +1350,7 @@ export const get_student_report = async (req, res) => {
 
         // ✅ Get student basic info
         const studentSql = `
-            SELECT id, name, roll_no password
+            SELECT id, name, roll_no , password
             FROM student_db
             WHERE id = ? 
         `;
@@ -1263,7 +1358,7 @@ export const get_student_report = async (req, res) => {
         const [student] = await pool.query(studentSql, [id]);
 
         if (student.length === 0) {
-            return res.status(404).json({ message: "Student not found" });
+            return res.status(404).json({ message: "Student not found first error" });
         }
 
         const student_id = student[0].id;
@@ -1328,17 +1423,17 @@ export const get_students_by_class = async (req, res) => {
             });
         }
 
-      let sql = `
+        let sql = `
       SELECT *
       FROM student_db s
       WHERE s.class_id = ?
       `
 
-      let [result] = await pool.query(sql,[class_id])
+        let [result] = await pool.query(sql, [class_id])
 
         return res.status(200).json({
             message: "Students fetched successfully",
-           result
+            result
         });
 
     } catch (error) {
