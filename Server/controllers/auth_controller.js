@@ -79,27 +79,17 @@ if (!email || !password || !role) {
     }
 
   try {
-            let sql = `SELECT * from teacher_db WHERE email = ?`
+            let sql = `SELECT * from teacher_db WHERE email = ? AND password = ?`
 
-            let [data] = await pool.query(sql, [email])
+            let [data] = await pool.query(sql, [email,password])
 
             if(!data){
-                return res.status(400).json({message:"this email is not registered with this account"})
+                return res.status(400).json({message:"the user not found with this email and password"})
             }
 
-            let stored_pass = data[0].password
+      
 
-            // comparing work to password
-
-            let is_user = await bcrypt.compare(password, stored_pass)
-
-            if (!is_user) {
-                return res.status(400).json({
-                    message: "something wrong email or password"
-                })
-            }
-
-
+            
             // jwt work 
 
             let payload = {

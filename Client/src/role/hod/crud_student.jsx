@@ -17,7 +17,8 @@ const [searchText,setSearchText] = useState("")
 
 const [selectedStudentReport,setSelectedStudentReport] = useState(null)
 const [loadingReport,setLoadingReport] = useState(false)
-
+const [ get_score_data,set_score_data] = useState(null)
+const [selectindex,setSelectedIndex] = useState(null)
 let token = localStorage.getItem("token")
 
    const getStudentReport = async (item) => {
@@ -32,7 +33,7 @@ let token = localStorage.getItem("token")
     try{
         setLoadingReport(true)
 
-        const url = `${import.meta.env.VITE_DOMAIN}/hod/student/report?id=${item.student_id}&class_id=${item.class_id}&course_id=${item.course_id}`
+        const url = `${import.meta.env.VITE_DOMAIN}/hod/student/report?id=${item.id}&class_id=${item.class_id}&course_id=${item.course_id}`
 
         const res = await fetch(url,{
             headers:{
@@ -43,6 +44,7 @@ let token = localStorage.getItem("token")
         const data = await res.json()
 
         console.log("REPORT:",data)
+        set_score_data(data)
 
         setSelectedStudentReport(data)
 
@@ -112,6 +114,8 @@ console.log(" data of student",data.result)
         console.log(err)
     }
 }
+
+
 
 
 useEffect(()=>{
@@ -194,108 +198,182 @@ onChange={(e)=>setSearchText(e.target.value)}
 {
 students.length ?
 students.map((item,index)=>(
-<div key={index} className="flex rounded-2xl flex-col my-2 p-5 shadow-xl gap-2 bg-white  h-fit" >
-    <div className="  flex justify-between      ">
-         <div>
-        <p className=" font-bold flex gap-3 items-center  "> <LuUserRound/> {item.name}</p>
-<p className=" font-bold  flex gap-3 items-center  "><LuAtSign/>{item.email}</p>
-<p className=" font-bold   flex gap-3 items-center  "> Roll No {item.roll_no}</p>
+<div key={index} className="flex rounded-2xl flex-col my-2 p-5 shadow gap-2 bg-white  h-fit" >
+    <div className="flex justify-between items-center bg-white  rounded-2xl p-5 shadow-sm hover:shadow-md transition">
 
-    </div>
+  {/* Left : Student Info */}
+  <div className="flex flex-col gap-2">
+    
+    <p className="flex items-center gap-3 text-lg font-semibold text-gray-800">
+      <LuUserRound className="text-orange-500 text-xl" />
+      {item.name}
+    </p>
 
-<div>
-<button
-className="px-4 py-2 bg-blue-500 text-white rounded-xl"
-onClick={()=>getStudentReport(item)}
->
-View Report
-</button>
+    <p className="flex items-center gap-3 text-sm text-gray-500">
+      <LuAtSign className="text-gray-400" />
+      {item.email}
+    </p>
+
+    <p className="flex items-center gap-3 text-sm font-medium text-gray-600">
+      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+      Roll No : {item.roll_no}
+    </p>
+
+  </div>
+
+  {/* Right : Action Button */}
+  <div>
+    <Ok_button
+    text={"View Report"}
+      onClick={() =>{
+    setSelectedIndex(index)
+getStudentReport(item)
+
+      } }
+      className="
+        px-5 py-2.5
+        bg-gradient-to-r from-blue-500 to-blue-600
+        hover:from-blue-600 hover:to-blue-700
+        text-white font-medium
+        rounded-xl shadow
+        hover:shadow-lg
+        active:scale-95
+        transition-all duration-200
+      "
+    />
+  </div>
 
 </div>
-    </div>
-   
 
+   
 {
+selectindex === index && <div>
+
+    {
 loadingReport && <p className="text-blue-500">Loading Report...</p>
 }
-
 {
 selectedStudentReport && (
-<div className=" p-6 rounded-2xl  mt-4">
+<div className="p-6 bg-white rounded-3xl flex flex-col gap-6 mt-4 ">
 
-<h2 className="text-xl font-bold mb-3">
-Student Report : {selectedStudentReport.student.name}
-</h2>
+  {/* Header */}
+  <div className="flex justify-between items-center">
+    <h2 className="text-2xl font-bold text-gray-800">
+      Student Report : {selectedStudentReport.student.name}
+    </h2>
 
-<p className="flex gap-3 items-center "><b><LuLock/></b> {selectedStudentReport.student.password}</p>
+    <button
+      onClick={() => setSelectedStudentReport(null)}
+      className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow transition"
+    >
+      Close
+    </button>
+  </div>
 
-<hr className="my-3"/>
+  {/* Password */}
+  <p className="flex items-center gap-2 text-sm text-gray-500">
+    <LuLock className="text-gray-400" />
+    {selectedStudentReport.student.password}
+  </p>
 
+  <hr />
 
-<div className=" justify-between overflow-hidden grid grid-cols-6 w-full h-fit">
+  {/* Top Stats */}
+  <div className="grid grid-cols-6 gap-6">
 
-    <div className="w-fit col-span-2  bg-orange-100 flex gap-3 flex-col p-4 rounded-2xl justify-center items-center">
+    {/* Overall Attendance Card */}
+    <div className="col-span-2 bg-gradient-to-br from-orange-100 to-orange-200 rounded-3xl p-6 flex flex-col items-center justify-center shadow">
 
-         <CircleProgress value={50} size={100}/>
-<h3 className="font-semibold text-lg">Overall Attendance</h3>
+      <CircleProgress
+        value={get_score_data?.overall?.percentage ?? 0}
+        size={110}
+      />
 
+      <h3 className="mt-4 text-lg font-semibold text-gray-700">
+        Overall Attendance
+      </h3>
 
+      <p className="text-sm text-gray-500">
+        {get_score_data?.overall?.present ?? 0} / {get_score_data?.overall?.total_lectures ?? 0} Lectures
+      </p>
 
     </div>
 
-    <div className= "w-full p-4 col-span-4 gap-4 bg-green-200 grid grid-cols-3  ">
+    {/* Subject Cards */}
+    <div className="col-span-4 grid grid-cols-2 gap-4">
 
-<div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div>
-<div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div> <div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div><div>
-    <CircleProgress value={50} size={60}/>
-    <p>android</p>
-</div>
+      {get_score_data?.subjects?.length > 0 ? (
+        get_score_data.subjects.map((sub, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow hover:shadow-md transition"
+          >
+            <CircleProgress value={sub.percentage ?? 0} size={65} />
+
+            <div>
+              <p className="font-semibold text-gray-800">{sub.subject}</p>
+              <p className="text-sm text-gray-500">
+                {sub.present ?? 0} / {sub.total_lectures ?? 0}
+              </p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-400">No subjects found</p>
+      )}
+
     </div>
+  </div>
+
+  {/* Table */}
+  <div className="bg-white rounded-3xl shadow overflow-hidden">
+
+    <div className="px-6 py-4 border-b">
+      <h3 className="font-semibold text-gray-700">Detailed Attendance</h3>
+    </div>
+
+    <table className="w-full">
+      <thead className="bg-gray-800 text-white">
+        <tr>
+          <th className="p-4 text-left">Subject</th>
+          <th className="p-4 text-center">Total</th>
+          <th className="p-4 text-center">Present</th>
+          <th className="p-4 text-center">Percentage</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {get_score_data?.subjects?.length > 0 ? (
+          get_score_data.subjects.map((sub, i) => (
+            <tr key={i} className="border-t hover:bg-gray-50 transition">
+              <td className="p-4 font-medium text-gray-700">{sub.subject}</td>
+              <td className="p-4 text-center">{sub.total_lectures ?? 0}</td>
+              <td className="p-4 text-center">{sub.present ?? 0}</td>
+              <td className="p-4 text-center font-semibold text-blue-600">
+                {sub.percentage ?? 0}%
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="4" className="text-center p-8 text-gray-400">
+              No Attendance Data Available
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
-
-
-
-<button
-className="mt-4 px-4 py-2 bg-red-400 text-white rounded"
-onClick={()=>setSelectedStudentReport(null)}
->
-Close
-</button>
-
-</div>
 )
 }
+</div>
+}
+
+
+
 
 </div>
 ))

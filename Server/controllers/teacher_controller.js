@@ -100,11 +100,12 @@ export const teacher_classes = async (req, res) => {
     try {
 
         let sql = `
-        SELECT c.class_name, s.subject, t.name, t.email
+        SELECT css.id As course_id , css.name As course_name, c.id As class_id , c.class_name, s.subject, t.name, t.email
         FROM class_subject_db cs
         JOIN classes_db c ON  c.id = cs.class_id
         JOIN subject_db s ON s.id = cs.subject_id
         JOIN teacher_db t ON t.id = cs.teacher_id
+        JOIn course_db css ON css.id = c.course_id
         WHERE cs.teacher_id = ?
         `
 

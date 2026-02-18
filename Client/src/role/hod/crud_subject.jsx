@@ -93,78 +93,89 @@ export const Crud_subjects = () => {
   )
 
   return (
-    <div className="w-full h-full bg-amber-500">
+   <div className="w-full h-full overflow-hidden bg-slate-100 p-6">
 
-      <div className="w-full h-full relative bg-slate-100 gap-5 grid grid-cols-2">
+  <div className="w-full h-full relative grid grid-cols-2 gap-6">
 
-        {/* TITLE */}
-        <div className="absolute top-5 left-4 w-fit h-fit bg-gray-900 rounded-2xl">
-          <h2 className="text-sm font-semibold text-white px-4 py-2">
-            Add OR Update Subjects
-          </h2>
-        </div>
+    {/* ===== TITLE BADGE ===== */}
+    <div className="absolute -top-3 left-4 bg-gradient-to-r from-gray-800 to-gray-700 text-white px-5 py-2 rounded-xl shadow">
+      <h2 className="text-sm font-semibold tracking-wide">
+        Add / Manage Subjects
+      </h2>
+    </div>
 
-        {/* ADD FORM */}
-        <div className="bg-white justify-center items-center flex w-full h-full rounded-2xl">
 
-          <form
-            onSubmit={handleAdd}
-            className="flex flex-col bg-white shadow rounded-2xl p-5 gap-5"
+    {/* ================= ADD SUBJECT FORM ================= */}
+    <div className="bg-white flex justify-center items-center rounded-2xl shadow-lg">
+
+      <form
+        onSubmit={handleAdd}
+        className="w-[80%] max-w-md flex flex-col gap-6 p-8"
+      >
+        <h3 className="text-xl font-bold text-gray-700 border-b pb-3">
+          Add New Subject
+        </h3>
+
+        <Text_input
+          placholder={"Subject Name"}
+          name={"subjects"}
+          type={"text"}
+          lbname={"subject"}
+          onChange={(value) => setSubName(value)}
+        />
+
+        <Ok_button text={"Add Subject"} />
+      </form>
+
+    </div>
+
+
+    {/* ================= SUBJECT LIST ================= */}
+    <div className="bg-white flex flex-col rounded-2xl overflow-hidden shadow-lg p-6">
+
+      {/* SEARCH BAR */}
+      <div className="flex items-center gap-3 border rounded-xl  px-4 py-3 focus-within:ring-2 ring-orange-400">
+        <LuSearch className="text-gray-400" size={22}/>
+        <input
+          placeholder="Search Subject..."
+          className="w-full outline-none"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+
+      {/* LIST */}
+      <div className="mt-6 flex flex-col gap-3 overflow-y-auto pr-2">
+
+        {filteredSubjects.length === 0 && (
+          <div className="text-center text-gray-400 py-10">
+            No Subject Found
+          </div>
+        )}
+
+        {filteredSubjects.map((item) => (
+          <div
+            key={item.id}
+            className="flex justify-between border-gray-200 border items-center bg-slate-50 hover:bg-orange-50 transition-all hover:border-orange-400 bg-white rounded-xl px-4 py-3"
           >
-            <Text_input
-              placholder={"Subject Name"}
-              name={"subjects"}
-              type={"text"}
-              lbname={"subject"}
-              onChange={(value) => setSubName(value)}
-            />
+            <h2 className="font-semibold text-gray-700">
+              {item.subject}
+            </h2>
 
-            <Ok_button text={"Add"} />
-          </form>
-        </div>
-
-        {/* SUBJECT LIST */}
-        <div className="bg-white w-full flex flex-col gap-5 h-full p-5 rounded-2xl">
-
-          {/* SEARCH */}
-          <div className="flex gap-4 items-center shadow w-full rounded-2xl p-4">
-            <div className="shadow p-2 rounded-xl">
-              <LuSearch size={30} />
-            </div>
-
-            <input
-              placeholder="Search Subject"
-              className="w-full border-2 outline-orange-500 border-gray-700 py-2 rounded-xl px-3"
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+            <Delete_button
+              text={"Delete"}
+              onClick={() => handleDelete(item.id)}
             />
           </div>
+        ))}
 
-          {/* LIST */}
-          <div className="w-full h-full overflow-y-auto flex flex-col gap-3">
-
-            {filteredSubjects.length === 0 && (
-              <p className="text-center text-gray-500">No Subject Found</p>
-            )}
-
-            {filteredSubjects.map((item) => (
-              <div
-                key={item.id}
-                className="p-3 flex justify-between items-center bg-white shadow rounded-xl"
-              >
-                <h2 className="text-sm font-semibold">{item.subject}</h2>
-
-                <Delete_button
-                  text={"Delete"}
-                  onClick={() => handleDelete(item.id)}
-                />
-              </div>
-            ))}
-
-          </div>
-        </div>
       </div>
     </div>
+
+  </div>
+</div>
+
   )
 }

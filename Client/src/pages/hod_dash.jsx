@@ -276,42 +276,92 @@ const open_course_fun = () =>{
                 {/* side bar */}
 
 
-                <div className=" flex flex-col p-2  justify-between overflow-hidden h-full rounded-2xl bg-white w-full  col-span-1">
+                <div className=" flex flex-col p-2  justify-between overflow-hidden overflow-y-scroll  h-full rounded-2xl bg-white w-full  col-span-1">
 
 
                     {/* heading name  */}
 
-
-                    <div className="px-2 flex justify-around items-center rounded-2xl py-3 bg-gray-800" >
-                        <h1 className=" text-white font-semibold">HOD Dashboard</h1>
-                    </div>
-
-                    {/* function names */}
+ {/* ================= HEADER ================= */}
+    <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-xl py-4 text-center font-semibold tracking-wide">
+        HOD Dashboard
+    </div>
 
 
-                    <div className="h-full w-full py-4" >
-                        <ul className="w-full flex flex-col justify-between h-full text-[15px] ">
-                            <li onClick={open_home_fun} className=" bg-white shadow rounded-xl py-5 hover:scale-105 flex justify-center duration-100 cursor-pointer shadow-gray-500 p-1 text-center"><LuHouse size={20} /></li>
-                            <li onClick={open_teacher_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> < LuSettings/> Teacher</li>
-                            <li onClick={open_student_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> <LuUserSearch/>Student</li>
-                            <li onClick={open_course_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> <LuSettings/>Course</li>
-                            <li onClick={open_classes_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"> < LuPlus/>Class</li>
-                            <li onClick={open_subjects_fun} className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center" > <LuSettings/>Subject</li>
-                            <li className=" bg-white shadow rounded-xl hover:scale-105 duration-100 cursor-pointer shadow-gray-500 p-1 text-center flex gap-3 justify-center items-center"><LuTable/> Attendance</li>
+    {/* ================= MENU ================= */}
+    <div className="flex-1 py-6">
+        <ul className="flex flex-col gap-3 text-sm">
+
+            <li
+                onClick={open_home_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuHouse size={18}/> Home
+            </li>
+
+            <li
+                onClick={open_teacher_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuSettings size={18}/> Teacher
+            </li>
+
+            <li
+                onClick={open_student_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuUserSearch size={18}/> Student
+            </li>
+
+            <li
+                onClick={open_course_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuSettings size={18}/> Course
+            </li>
+
+            <li
+                onClick={open_classes_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuPlus size={18}/> Class
+            </li>
+
+            <li
+                onClick={open_subjects_fun}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuSettings size={18}/> Subject
+            </li>
+
+            <li
+                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+            >
+                <LuTable size={18}/> Attendance
+            </li>
+
+        </ul>
+    </div>
 
 
-                        </ul>
-                    </div>
+    {/* ================= PROFILE ================= */}
+    <div className="bg-gradient-to-br  from-orange-500 to-orange-400 text-white rounded-xl p-4 flex flex-col gap-3 shadow-md">
 
-                    {/* profile data  */}
+        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+            <LuUserRound size={16}/>
+            <span className="text-sm">{get_profile.name}</span>
+        </div>
 
+        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+            <LuAtSign size={16}/>
+            <span className="text-sm break-all">{get_profile.email}</span>
+        </div>
 
-                    <div className="bg-orange-500 flex flex-col gap-2 rounded-2xl p-5 ">
-                        <p className=" text-white text-sm bg-orange-600 p-1 rounded-xl flex gap-2 wrap-break-word items-center justify-center"> <span><LuUserRound /></span>{get_profile.name}</p>
-                        <h1 className=" text-gray-200 bg-orange-600 p-1  rounded-xl flex wrap-break-word justify-center items-center gap-2 text-sm font-semibold"> <span><LuAtSign /></span> {get_profile.email}</h1>
+        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+            <LuBuilding size={16}/>
+            <span className="text-sm">{get_profile.department_name}</span>
+        </div>
 
-                        <p className="text-white text-sm  bg-orange-600 p-1 rounded-xl wrap-break-word flex justify-center items-center gap-2"><span><LuBuilding /></span> {get_profile.department_name}</p>
-                    </div>
+    </div>
                 </div>
 
 
@@ -386,7 +436,7 @@ const open_course_fun = () =>{
         <LuUsersRound />
         Present: {get_course_score.present_student || 0}
       </div>
-      <div className="flex items-center gap-2 text-sm font-bold text-blue-600">
+      <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
         <LuUsersRound />
         Total: {get_course_score.total_student || 0}
       </div>

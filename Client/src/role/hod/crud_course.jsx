@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { LuAtSign, LuSearch } from "react-icons/lu";
+import { LuAtSign, LuSearch, LuBookOpen } from "react-icons/lu";
 
 import Text_input from "../../component/inputfiled";
 import Ok_button, { Cancel_button, Delete_button } from "../../component/buttons";
 
-export const Crud_course = ({course_data , reload}) => {
-
-    
-   const [courseName, setCourseName] = useState("");
+export const Crud_course = ({ course_data, reload }) => {
+  const [courseName, setCourseName] = useState("");
   const [courses, setCourses] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [search, setSearch] = useState("");
@@ -15,7 +13,7 @@ export const Crud_course = ({course_data , reload}) => {
   useEffect(() => {
     setCourses(course_data);
   }, [course_data]);
-console.log("Curses" , )
+
   const filteredCourses = courses.filter((course) =>
     course?.name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -69,81 +67,97 @@ console.log("Curses" , )
 
     reload();
   };
-  
-  ;
 
   return (
-    <div className="w-full h-full bg-slate-100">
-      <div className="w-full h-full relative gap-5 grid grid-cols-2 p-5">
-        {/* Title */}
-        <div className="absolute top-5 left-5 bg-gray-900 rounded-2xl">
-          <h2 className="text-sm font-semibold text-white px-4 py-2">
-            {editIndex !== null ? "Update Course" : "Add Course"}
-          </h2>
-        </div>
+    <div className="w-full h-full bg-gradient-to-br overflow-hidden from-slate-100 to-slate-200 p-6">
+      <div className="grid grid-cols-2 overflow-hidden gap-6 h-full">
 
-        {/* ================= FORM ================= */}
-        <div className="bg-white flex justify-center items-center rounded-2xl">
-          <form
-            className="flex flex-col bg-white shadow rounded-2xl p-5 gap-5 w-[80%]"
-          >
-            <Text_input
-              placholder="Course Name"
-              name="course"
-              type="text"
-              onChange={(value) => setCourseName(value)}
-              lbname="course"
-              lbval={<LuAtSign />}
-            />
+        {/* ================= LEFT FORM ================= */}
+        <div className="bg-white/70 backdrop-blur-xl shadow-xl rounded-3xl p-8 flex flex-col justify-center">
 
-            <Ok_button onClick={handleSubmit} text={editIndex !== null ? "Update" : "Add"} />
+          <div className="flex items-center gap-3 mb-6">
+            <LuBookOpen size={28} className="text-orange-400" />
+            <h2 className="text-xl font-bold text-gray-700">
+              {editIndex !== null ? "Update Course" : "Add New Course"}
+            </h2>
+          </div>
+
+          <form className="flex flex-col gap-6">
+            <div className="relative">
+              <input
+                value={courseName}
+                onChange={(e) => setCourseName(e.target.value)}
+                placeholder="Enter Course Name..."
+                className="w-full border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition px-12 py-3 rounded-xl outline-none"
+              />
+              <LuAtSign className="absolute left-4 top-3.5 text-gray-400" size={20} />
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              className={`py-3 rounded-xl text-white font-semibold transition-all duration-300
+              ${editIndex !== null
+                  ? "bg-blue-500 hover:bg-blue-600"
+                  : "bg-orange-300 hover:bg-orange-600"
+                }`}
+            >
+              {editIndex !== null ? "Update Course" : "Add Course"}
+            </button>
           </form>
         </div>
 
-        {/* ================= LIST ================= */}
-        <div className="bg-white flex flex-col gap-5 h-full p-5 rounded-2xl">
-          {/* Search Header */}
-          <div className="flex gap-4 items-center shadow rounded-2xl p-4">
-            <div className="bg-orange-100 p-2 rounded-xl">
-              <LuSearch size={25} />
-            </div>
+        {/* ================= RIGHT LIST ================= */}
+        <div className="bg-white/70 backdrop-blur-xl shadow-xl overflow-hidden rounded-3xl p-6 flex flex-col h-full">
 
+          {/* Search */}
+          <div className="relative mb-5">
+            <LuSearch className="absolute left-4 top-3 text-gray-400" size={20} />
             <input
-              placeholder="Search Course"
-              className="w-full border outline-orange-500 border-gray-400 py-2 rounded-xl px-3"
+              placeholder="Search Course..."
+              className="w-full border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition pl-10 py-3 rounded-xl outline-none"
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          {/* Course List */}
-          <div className="w-full h-95 overflow-y-scroll flex flex-col gap-4">
+          {/* List */}
+          <div className="flex flex-col gap-3 overflow-y-auto pr-2">
             {filteredCourses.length === 0 && (
-              <p className="text-center text-gray-400">No Course Found</p>
+              <div className="text-center py-10 text-gray-400">
+                No Course Found
+              </div>
             )}
 
             {filteredCourses.map((course, index) => (
               <div
                 key={index}
-                className="w-full p-3 flex justify-between items-center bg-white shadow rounded-xl"
+                className="group flex justify-between hover:bg-orange-50 items-center p-4 rounded-xl border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all duration-300"
               >
-                <h2 className="text-sm font-semibold">{course.name}</h2>
+                <h2 className="font-semibold text-gray-700">
+                  {course.name}
+                </h2>
 
-                {/* Buttons */}
-                <div className="flex flex-col gap-2">
-                  <div onClick={() => handleEdit(index)}>
-                    <Cancel_button text="Update" />
-                  </div>
+                <div className="flex gap-3 opacity-70 group-hover:opacity-100 transition">
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="px-4 py-1.5 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                  >
+                    Update
+                  </button>
 
-                  <div onClick={() => handleDelete(index)}>
-                    <Delete_button text="Delete" />
-                  </div>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="px-4 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -70,8 +70,7 @@ export const add_teacher = async (req, res) => {
             });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+     
 
         let sql = `
       INSERT INTO teacher_db(email,password,name,gender,mobile_number,hod_id)
@@ -80,7 +79,7 @@ export const add_teacher = async (req, res) => {
 
         await pool.query(sql, [
             email,
-            hashedPassword,
+            password,
             name,
             gender,
             mobile_number,
@@ -116,16 +115,7 @@ export const update_teacher = async (req, res) => {
 
     try {
 
-        if (fields.password) {
-
-            let salt = 10
-            let salted_round = await bcrypt.genSalt(salt)
-            fields.password = await bcrypt.hash(fields.password, salted_round)
-
-
-
-
-        }
+       
 
         let updates = []
         let values = []
@@ -1229,44 +1219,78 @@ export const see_particular_subject = async (req, res) => {
 }
 
 
-// Can see particular student attendancely score status
+// Can see particular student attendancely score status class
 
 export const see_particular_student = async (req, res) => {
+
     let student_id = req.params?.student
     let roll_no = req.params?.roll_no
 
     try {
 
-
         let sql = `
-        SELECT COUNT(*) AS total_att,
-        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_class,
-        ROUND(
-SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100 
-              ) AS percentage
-    
-        FROM att_db a
-        JOIN student_db s ON s.id=a.student_id
-        JOIN class
-    WHERE a.student_id = ? AND s.roll_no = ?
+        SELECT 
+            sb.id AS subject_id,
+            sb.subject,
 
+            COUNT(a.id) AS total_lectures,
+
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_count,
+
+            ROUND(
+                IFNULL(
+                    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) 
+                    / NULLIF(COUNT(a.id),0) * 100,
+                0),
+            2) AS percentage
+
+        FROM student_db s
+
+        JOIN class_subject_db cs ON cs.class_id = s.class_id
+
+        JOIN subject_db sb ON sb.id = cs.subject_id
+
+        LEFT JOIN att_db a 
+            ON a.subject_id = sb.id 
+            AND a.student_id = s.id
+
+        WHERE s.id = ? AND s.roll_no = ?
+
+        GROUP BY sb.id, sb.subject
         `
 
+        let [subjectWise] = await pool.query(sql, [student_id, roll_no])
 
-        let [result] = await pool.query(sql, [student_id, roll_no])
+        // ✅ overall calculate
+        let total_att = 0
+        let present_class = 0
+
+        subjectWise.forEach(sub => {
+            total_att += sub.total_lectures
+            present_class += sub.present_count
+        })
+
+        let percentage = total_att === 0 ? 0 : ((present_class / total_att) * 100).toFixed(2)
 
         return res.status(200).json({
             message: "data collect successfully",
-            result
+            overall: {
+                total_att,
+                present_class,
+                percentage
+            },
+            subjects: subjectWise
         })
+
     } catch (error) {
         return res.status(500).json({
-            message: "error from reading particular  student ",
+            message: "error from reading particular student",
             error
         })
     }
-
 }
+
+
 
 export const filter_read_student = async (req, res) => {
 
@@ -1379,20 +1403,40 @@ export const get_student_report = async (req, res) => {
         const [overall] = await pool.query(overallSql, [student_id]);
 
         // ✅ Subject-wise Attendance
-        const subjectSql = `
-            SELECT 
-                sb.subject,
-                COUNT(a.id) AS total_lectures,
-                SUM(CASE WHEN a.status='P' THEN 1 ELSE 0 END) AS present,
-                ROUND(
-                    (SUM(CASE WHEN a.status='P' THEN 1 ELSE 0 END) / COUNT(a.id)) * 100,
-                    2
-                ) AS percentage
-            FROM att_db a
-            JOIN subject_db sb ON sb.id = a.subject_id
-            WHERE a.student_id = ?
-            GROUP BY a.subject_id
-        `;
+       const subjectSql = `
+SELECT 
+    sb.id AS subject_id,
+    sb.subject,
+
+    COUNT(a.id) AS total_lectures,
+
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present,
+
+    ROUND(
+        IFNULL(
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END)
+            / NULLIF(COUNT(a.id),0) * 100,
+        0),
+    2) AS percentage
+
+FROM student_db s
+
+/* student's class subjects */
+JOIN class_subject_db cs ON cs.class_id = s.class_id
+
+JOIN subject_db sb ON sb.id = cs.subject_id
+
+/* attendance optional */
+LEFT JOIN att_db a 
+    ON a.subject_id = sb.id
+    AND a.student_id = s.id
+
+WHERE s.id = ?
+
+GROUP BY sb.id, sb.subject
+ORDER BY sb.subject ASC
+`;
+
 
         const [subjects] = await pool.query(subjectSql, [student_id]);
 
