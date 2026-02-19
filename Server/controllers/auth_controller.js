@@ -21,11 +21,12 @@ export const login = async (req, res) => {
             let sql = `SELECT * from hod_db WHERE email = ?`
 
             let [data] = await pool.query(sql, [email])
-            if(!data){
-                return res.json({
-                    message:"the hod email is not registered ever"
-                })
-            }
+           
+if (data.length === 0) {
+    return res.status(404).json({
+        message: "Email not registered"
+    })
+}
             let stored_pass = data[0].pass
 
             // comparing work to password
@@ -43,7 +44,8 @@ export const login = async (req, res) => {
 
             let payload = {
                 id: data[0].id,
-                email: data[0].email
+                email: data[0].email,
+                role: "hod"
             }
 
             let token = await jwt.sign(payload,process.env.JWT_key,{expiresIn:"1h"})
@@ -79,22 +81,34 @@ if (!email || !password || !role) {
     }
 
   try {
-            let sql = `SELECT * from teacher_db WHERE email = ? AND password = ?`
+            let sql = `SELECT * from teacher_db WHERE email = ?`
 
-            let [data] = await pool.query(sql, [email,password])
-
-            if(!data){
-                return res.status(400).json({message:"the user not found with this email and password"})
-            }
-
-      
+            let [data] = await pool.query(sql, [email])
 
             
+if (data.length === 0) {
+    return res.status(404).json({
+        message: "Email not registered"
+    })
+}
+            let stored_pass = data[0].password
+
+            // comparing work to password
+
+
+            if (stored_pass !== password) {
+                return res.status(400).json({
+                    message: "something wrong email or password"
+                })
+            }
+
+
             // jwt work 
 
             let payload = {
                 id: data[0].id,
-                email: data[0].email
+                email: data[0].email,
+                role: "teacher"
             }
 
             let token = await jwt.sign(payload,process.env.JWT_key,{expiresIn:"1h"})

@@ -1,8 +1,36 @@
+import { useEffect, useState } from "react"
 import { LuAtSign, LuBuilding, LuHouse, LuPlus, LuSettings, LuTable, LuUserRound, LuUserSearch } from "react-icons/lu"
 import { SlSettings } from "react-icons/sl"
 
 export  const Side_bar = ()=>{
 
+    const [get_profile, set_profile] = useState({})
+    const teacher_profile = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_DOMAIN}/teacher/profile`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    
+"Authorization": `Bearer ${localStorage.getItem("token")}`
+
+                }
+            })
+            const data = await response.json()
+            console.log("teacher profile data",data)
+            if (!response.ok) {
+                return console.log("error from reading teacher profile", data)
+            }
+            set_profile(data.result)
+            console.log("teacher profile", get_profile)
+        } catch (error) {
+            return console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        teacher_profile()
+    }, [])
     return(
 
 
@@ -50,17 +78,17 @@ export  const Side_bar = ()=>{
 
         <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
             <LuUserRound size={16}/>
-            <span className="text-sm">abid sir</span>
+            <span className="text-sm">{get_profile.length > 0 && get_profile[0].name}</span>
         </div>
 
         <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
             <LuAtSign size={16}/>
-            <span className="text-sm break-all">abid@gmail.com</span>
+            <span className="text-sm break-all">{get_profile.length > 0 && get_profile[0].email}</span>
         </div>
 
         <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
             <LuBuilding size={16}/>
-            <span className="text-sm">Computer Science</span>
+            <span className="text-sm">{get_profile.length > 0 && get_profile[0].gender}</span>
         </div>
 
     </div>

@@ -5,6 +5,7 @@ import { LuAtSign, LuBuilding, LuLock, LuUser, LuUserRound } from "react-icons/l
 import { Failure_Message } from "../component/message";
 import Spiner from "../component/spiner";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 export const Loging = () => {
 
     const navigate = useNavigate()
@@ -25,6 +26,8 @@ export const Loging = () => {
             set_on_spiner(false)
             return;
         }
+
+        console.log("Login data:", { role: get_role, email: get_data.email, password: get_data.password });
         // API CALL
         try {
             const response = await fetch(`${import.meta.env.VITE_DOMAIN}/auth/login`, {
@@ -36,13 +39,34 @@ export const Loging = () => {
             });
 
             const res = await response.json();
-            if (!response.ok) {
-                set_on_spiner(false);
-                set_failure_message(true);
-                console.error("Login API error:", res);
-            }
-        navigate("/hod/dashboard")    
-        localStorage.setItem("token", res.token);
+           if (!response.ok) {
+    set_on_spiner(false);
+    set_failure_message(true);
+    console.error("Login API error:", res.message);
+    return; // ⛔ STOP here if login failed
+}
+
+// ✅ Only runs when login SUCCESS
+if (!res.token) {
+    console.error("Token not received from server");
+    return;
+}
+
+localStorage.setItem("token", res.token);
+
+const decoded = jwtDecode(res.token);
+console.log("Decoded:", decoded);
+
+
+        console.log("data of decoded",decoded)
+        if(decoded.role === "teacher"){
+            navigate("/teacher/dashboard")
+        }else if(decoded.role === "hod"){
+            navigate("/hod/dashboard")
+        }else if(decoded.role === "student"){
+            navigate("/student/dashboard")
+        }
+        
         } catch (err) {
             set_on_spiner(true);
             set_failure_message(true);

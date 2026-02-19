@@ -12,7 +12,7 @@ export const Teacher_dash = () => {
 </div>
 
 
-<div className=" col-span-4 h-full ">
+<div className=" col-span-4 h-full overflow-hidden"> 
 <Main/>
 </div>
 
