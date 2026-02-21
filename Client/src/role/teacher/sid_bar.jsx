@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { LuAtSign, LuBuilding, LuHouse, LuPlus, LuSettings, LuTable, LuUserRound, LuUserSearch } from "react-icons/lu"
 import { SlSettings } from "react-icons/sl"
 
-export  const Side_bar = ()=>{
+export  const Side_bar = ({item})=>{
 
     const [get_profile, set_profile] = useState({})
     const teacher_profile = async () => {
@@ -45,18 +45,12 @@ export  const Side_bar = ()=>{
         <ul className="flex flex-col gap-3 text-sm">
 
             <li
-                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+               onClick={()=>item("home")} className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
             >
                 <LuHouse size={18}/> Home
             </li>
 
-            <li
-                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
-            >
-                <LuSettings size={18}/> Teacher
-            </li>
-
-          
+            
 
         
 
@@ -64,11 +58,7 @@ export  const Side_bar = ()=>{
 
           
 
-            <li
-                className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
-            >
-                <LuTable size={18}/> Attendance
-            </li>
+           
 
         </ul>
     </div>

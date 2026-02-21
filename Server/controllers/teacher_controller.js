@@ -204,7 +204,7 @@ SELECT * FROM subject_db WHERE id = ?
         let sql_score = `
 SELECT COUNT(*) AS total ,
 SUM(CASE WHEN status ='P' THEN 1 ELSE 0 END ) AS present_classes 
- from att_db WHERE teacher_id = ? AND subject_id = ? AND student_id =?
+ FROM att_db WHERE teacher_id = ? AND subject_id = ? AND student_id =?
 
 `
         let [result] = await pool.query(sql_score, [teacher_id, subject_id, student_id])
@@ -375,4 +375,66 @@ export const read_particular_attendance = async (req, res) => {
   }
 };
 
+export const filter_read_student_teacher = async (req, res) => {
+let teacher_id = req.user?.id
+    let course_id = req.query?.course  
+    let class_id = req.query?.class    
+    let search = req.query?.search   
 
+   
+
+    try {
+
+        let sql = `
+       SELECT 
+    a.*,
+    cl.id AS class_id,
+    c.id AS course_id
+
+FROM student_db a
+
+JOIN classes_db cl ON cl.id = a.class_id
+JOIN course_db c ON c.id = cl.course_id
+
+WHERE EXISTS (
+    SELECT 1
+    FROM class_subject_db cs
+    WHERE cs.class_id = cl.id
+    AND cs.teacher_id = ?
+)
+        `
+
+        let values = [teacher_id]
+
+        if (class_id) {
+            sql += ` AND cl.id = ?`
+            values.push(class_id)
+        }
+
+        if (course_id) {
+            sql += ` AND c.id = ?`
+            values.push(course_id)
+        }
+
+        if (search && search.trim() !== "") {
+            sql += ` AND a.name LIKE ?`
+            values.push(`%${search.trim()}%`)
+        }
+
+        sql += ` ORDER BY a.name ASC`
+
+
+        let [result] = await pool.query(sql, values)
+
+        return res.json({
+            message: "Data fetched successfully",
+            result
+        })
+
+    } catch (error) {
+        return res.json({
+            message: "Error fetching data",
+            error
+        })
+    }
+}

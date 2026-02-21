@@ -9,12 +9,13 @@ import {
     LuLayers
 } from "react-icons/lu";
 import { Attendance_data } from "../teacher/Attedance";
+import { Options } from "./options";
 
 
 export const Main = () => {
 
     const [get_classes, set_classes] = useState([])
-    const [open_attendance, set_open_attendance] = useState(false)
+    const [option, set_option] = useState(false)
     const [open_get_classes, set_open_get_classes] = useState(true)
     const [get_item_data, set_item_data] = useState({})
     const read_teacher_classes = async () => {
@@ -42,6 +43,8 @@ export const Main = () => {
         }
     }
 
+    
+
 
 
     useEffect(() => {
@@ -65,7 +68,7 @@ export const Main = () => {
                                     <div key={index} onClick={() => {
                                         set_item_data(cls)
                                         set_open_get_classes(false)
-                                        set_open_attendance(true)
+                                        set_option(true)
                                     }} className="bg-white p-5 rounded-2xl shadow-md w-full h-40 border border-gray-200 cursor-pointer hover:shadow-lg transition duration-200">
 
                                         {/* Class Name */}
@@ -106,10 +109,11 @@ export const Main = () => {
 
 
                     </div></>
+
             }
 
             {
-                open_attendance && <Attendance_data item={get_item_data} />
+                option &&<div className="w-full h-full "> <Options item={get_item_data} /></div>
             }
         </div>
     )
