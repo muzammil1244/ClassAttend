@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LuPlus } from "react-icons/lu";
 import CircleProgress from "../../component/circle_progress";
 import { AddStudent } from "./add_student";
+import { Confirm_message } from "../../component/message";
 
 export const Student = ({ item  }) => {
   const [search, set_search] = useState("");
@@ -11,6 +12,8 @@ export const Student = ({ item  }) => {
 const [open_add_student,set_add_student]=useState(false)
 const[read_student,set_read_student] = useState(true)
 const [update_data,set_update]= useState({})
+const [confirm ,set_confirm] = useState(false)
+const [delete_student_id,set_delete_student_id] = useState(null)
   /* ---------------- FETCH STUDENTS ---------------- */
 
   const filter_student = async () => {
@@ -40,16 +43,25 @@ const [update_data,set_update]= useState({})
   };
 
 
-  const delete_student =async(item)=>{
+  const delete_student =async()=>{
     try {
-      let res = await fetch(`${import.meta.env.VITE_DOMAIN}/teacher/delete/student/${item.id}`,{
+      let res = await fetch(`${import.meta.env.VITE_DOMAIN}/teacher/delete/student/${delete_student_id}`,{
         method:"DELETE",
         headers:{
           "Content-Type":"application/json",
           "Authorization":`Bearer ${localStorage.getItem("token")}`
         }
       })
+      if(!res.ok){
+        return console.log("data not deleted")
+        set_confirm(false)
+      }
+
+      console.log("data delete successfully")
+    filter_student()
+    set_confirm(false)
     } catch (error) {
+      set_confirm(false)
       return console.log(error)
     }
   }
@@ -151,7 +163,7 @@ const [update_data,set_update]= useState({})
 
             {/* ID */}
             <p className="text-gray-400 text-xs mt-3">
-              Student ID : {stu.id}
+              Password : {stu.password}
             </p>
 
             <div className="text-xs flex  justify-between text-blue-500 mt-3">
@@ -163,7 +175,10 @@ const [update_data,set_update]= useState({})
                 set_read_student(false)
                 set_update(stu)
               }} className=" text-orange-300 text-sm hover:decoration-1 decoration-dashed cursor-default hover:text-orange-500 duration-75 decoration-amber-300 ">update</span>
-             <span className=" text-red-300 text-sm hover:decoration-1 decoration-dashed cursor-default hover:text-red-500 duration-75 decoration-amber-300 ">delete</span>
+             <span className=" text-red-300 text-sm hover:decoration-1 decoration-dashed cursor-default hover:text-red-500 duration-75 decoration-amber-300 " onClick={()=>{
+set_confirm(true)
+set_delete_student_id(stu.id)
+             }}>delete</span>
               </div>
               
 
@@ -173,6 +188,8 @@ const [update_data,set_update]= useState({})
             </div>
           </div>
         ))}
+
+       
       </div>
 
       {/* Empty */}
@@ -181,6 +198,26 @@ const [update_data,set_update]= useState({})
           No Students Found
         </div>
       )}
+
+     {confirm && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+    <div className="animate-scaleIn">
+      <Confirm_message
+      cancel={()=>set_confirm(false)}
+      ok={()=>delete_student()}
+        heading={"Delete Student"}
+        message={"Are you sure you want to delete this student?"}
+        onCancel={() => set_confirm(false)}
+        onConfirm={() => {
+          delete_student(update_data.id);
+          set_confirm(false);
+        }}
+      />
+    </div>
+
+  </div>
+)}
     </div>
     }
     {
@@ -188,6 +225,8 @@ const [update_data,set_update]= useState({})
 <AddStudent item={item} updateData={update_data}/>
       </div>
     }
+
+    
     </>
    
     

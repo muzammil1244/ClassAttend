@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { Student } from "./student";
 import { Attendance_data } from "./Attedance";
-import { LuUsers, LuClipboardList, LuArrowLeft } from "react-icons/lu";
+import { LuUsers, LuClipboardList, LuArrowLeft, LuStepBack, LuBackpack, LuSkipBack } from "react-icons/lu";
 
-export const Options = ({ item }) => {
+export const Options = ({ item ,back }) => {
   const [view, setView] = useState("menu"); 
   // menu | student | attendance
 
   return (
     <div className="w-full h-full bg-white rounded-2xl ">
 
+ <button
+          onClick={() => back()}
+          className="flex items-center gap-2 mb-4 text-sm text-gray-600 hover:text-black"
+        >
+          <LuArrowLeft /> Back
+        </button>
       {/* ---------------- HEADER ---------------- */}
       {view !== "menu" && (
         <button

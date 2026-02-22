@@ -127,7 +127,7 @@ console.log(typeof(get_date),"daaaat")
     </div>
    
 </div>
-<div className="bg-white rounded-2xl shadow border max-h-[420px] overflow-y-auto">
+<div className="bg-white rounded-2xl shadow  max-h-[420px] overflow-y-auto">
 
 {get_att.map((att, index) => {
 

@@ -173,7 +173,7 @@ const today = new Date().toISOString().split("T")[0];
 <div className="flex gap-4 mb-4">
     <button
         onClick={markAllPresent}
-        className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg shadow"
+        className="flex items-center gap-2 bg-orange-400 text-white px-4 py-2 rounded-lg shadow"
     >
         <LuSquare /> Mark All Present
     </button>
@@ -248,7 +248,7 @@ return (
 <div className="mt-6 cursor-pointer">
     <button
         onClick={submit_att}
-        className="w-full bg-orange-500 hover:bg-orange-600 cursor-pointer  text-white py-3 rounded-xl text-lg font-semibold shadow-lg transition"
+        className="w-full bg-orange-400 hover:bg-orange-500 cursor-pointer  text-white py-3 rounded-xl text-lg font-semibold shadow-lg transition"
     >
         Save Attendance
     </button>

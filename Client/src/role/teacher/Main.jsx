@@ -113,7 +113,10 @@ export const Main = () => {
             }
 
             {
-                option &&<div className="w-full h-full "> <Options item={get_item_data} /></div>
+                option &&<div className="w-full h-full "> <Options item={get_item_data} back={()=>{
+                    set_open_get_classes(true)
+                    set_option(false)
+                }} /></div>
             }
         </div>
     )

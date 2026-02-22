@@ -45,7 +45,9 @@ export  const Side_bar = ({item})=>{
         <ul className="flex flex-col gap-3 text-sm">
 
             <li
-               onClick={()=>item("home")} className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
+               onClick={()=>{
+                window.location.reload()
+               }} className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
             >
                 <LuHouse size={18}/> Home
             </li>
