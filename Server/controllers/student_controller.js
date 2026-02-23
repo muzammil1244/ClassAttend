@@ -48,6 +48,7 @@ return res.status(200).json({
     
 }
 
+
 export const subjects_score =async (req, res) => {
 
     let student_id = req.user?.id
@@ -108,8 +109,9 @@ export const attendance_record=async(req,res)=>{
         let sql = `
         
         SELECT  
-*
-        FROM att_db 
+      a.status , a.att_date, s.subject
+        FROM att_db a
+        JOIN subject_db s ON  s.id = a.subject_id
         WHERE student_id = ?
         ORDER BY att_date
 
@@ -132,28 +134,40 @@ export const attendance_record=async(req,res)=>{
 
 }
 
-export const student_profile = async(req,res)=>{
+export const student_profile = async (req, res) => {
+  const student_id = req.user?.id;
+  if(!student_id){
 
-    let student_id = req.user?.id
-    try {
+    return res.status(401).json({
+        message:" student id not found here "
+    })
+  }
 
-        let sql = `
-        Select *
-        FROM student_db
-        WHERE id = ?
-        `
+  try {
+    const sql = `
+      SELECT 
+        s.name AS name,
+        s.email AS email,
+        s.roll_no AS roll_no,
+        c.class_name AS class_name,
+        cs.name AS course_name
+      FROM student_db s
+      JOIN classes_db c ON c.id = s.class_id
+      JOIN course_db cs ON cs.id = c.course_id
+      WHERE s.id = ?
+    `;
 
-        let [result] = await pool.query(sql,[student_id])
-        
-        return res.status(200).json({
-            message:"profile data collected successfully",
-            result
-        })
-        
-    } catch (error) {
-        return res.status(500).json({
-            message:"error from student profile",
-            error
-        })
-    }
-}
+    const [result] = await pool.query(sql, [student_id]);
+
+    return res.status(200).json({
+      message: "profile data collected successfully",
+      result: result || null
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "error from student profile",
+      error
+    });
+  }
+};

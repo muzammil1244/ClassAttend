@@ -7,6 +7,7 @@ import { Hod_dash } from './pages/hod_dash'
 import { Loging } from './pages/login'
 import { Create_Classes } from './role/hod/create_class'
 import { Teacher_dash } from './pages/teacher_dash'
+import { Student_dash } from './pages/student_dash'
 function App() {
 
   return (
@@ -14,9 +15,8 @@ function App() {
 
       <Routes>
         <Route path="/teacher/dashboard" element={<Teacher_dash />} />
-
         <Route path="/hod/dashboard" element={<Hod_dash />} />
-
+        <Route path='/student/dashboard' element={<Student_dash />} />
         <Route path="/register" element={<Register />} />
         <Route path='/login' element={<Loging />} />
       </Routes>

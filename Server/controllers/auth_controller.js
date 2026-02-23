@@ -139,7 +139,7 @@ if (data.length === 0) {
     }if(role == "student"){
 
 try {
-if(!student.roll_no ||  !student.name || !student.class_id){
+if(!email,!password){
     return res.status(401).json({
         message:"all field required for  student  data "
     })
@@ -147,10 +147,10 @@ if(!student.roll_no ||  !student.name || !student.class_id){
 
 let sql = `
 SELECT * from student_db
-WHERE name = ? AND class_id = ? AND roll_no = ?
+WHERE email = ? AND password = ? 
 `
 
-let [result] = await pool.query(sql,[student.name,student.class_id,student.roll_no])
+let [result] = await pool.query(sql,[email,password])
 
 if(result.length == 0){
     return res.status(401).json({
@@ -163,7 +163,8 @@ if(result.length == 0){
                 id: result[0].id,
                 name: result[0].name,
                  roll_no: result[0].roll_no,
-                 class_id:result[0].class_id
+                 class_id:result[0].class_id,
+                  role: "student"
             }
 
             let token = await jwt.sign(payload,process.env.JWT_key,{expiresIn:"1h"})
