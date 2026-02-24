@@ -95,8 +95,8 @@ export const Read_att = (item) => {
       {students[0] && (
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-100 p-3 rounded-xl">
-              <LuCalendarDays className="text-orange-500 text-xl" />
+            <div className="bg-white shadow p-3 rounded-xl">
+              <LuCalendarDays className="text-black text-xl" />
             </div>
 
             <div>
@@ -109,7 +109,7 @@ export const Read_att = (item) => {
 
           <button
             onClick={() => set_download(true)}
-            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition"
+            className="flex items-center gap-2 bg-white text-gray-600 px-4 py-2 rounded-xl hover:bg-slate-50  cursor-pointer transition"
           >
             <LuDownload size={18} />
             Download CSV
@@ -126,7 +126,7 @@ export const Read_att = (item) => {
 
       {/* TABLE */}
       <div className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
-        <div className="grid grid-cols-4 bg-orange-50 px-6 py-4 text-sm font-semibold text-gray-600">
+        <div className="grid grid-cols-4 bg-white px-6 py-4 text-sm font-semibold text-gray-600">
           <span>Roll No</span>
           <span>Name</span>
           <span>Status</span>
@@ -170,7 +170,7 @@ export const Read_att = (item) => {
 const StatCard = ({ icon, label, value, highlight, danger }) => {
   let style = "bg-white text-gray-700";
 
-  if (highlight) style = "bg-orange-50 text-orange-600";
+  if (highlight) style = "bg-green-50 text-gray-600";
   if (danger) style = "bg-red-50 text-red-500";
 
   return (

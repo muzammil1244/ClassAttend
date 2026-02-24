@@ -249,10 +249,10 @@ export const Crud_teacher = () => {
         <button
           type="button"
           onClick={handleSubmit}
-          className={`mt-6 w-full py-3 rounded-xl text-white font-semibold transition-all
+          className={`mt-6 w-full py-3 rounded-xl text-black shadow font-semibold transition-all
           ${editIndex !== null
               ? "bg-blue-500 hover:bg-blue-600"
-              : "bg-orange-500 hover:bg-orange-600"
+              : "bg-white hover:bg-gray-50"
             }`}
         >
           {editIndex !== null ? "Update Teacher" : "Add Teacher"}
@@ -260,7 +260,7 @@ export const Crud_teacher = () => {
       </div>
 
       {/* ================= LIST ================= */}
-      <div className="bg-white/70 backdrop-blur-xl shadow-xl rounded-3xl p-6 flex flex-col h-full">
+      <div className="bg-white/70 backdrop-blur-xl shadow-xl overflow-y-auto rounded-3xl p-6 flex flex-col h-full">
 
         <h1 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">
           Teacher List

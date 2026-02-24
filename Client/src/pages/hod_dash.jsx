@@ -10,6 +10,7 @@ import { Crud_classes } from "../role/hod/crud_classes"
 import { Create_Classes } from "../role/hod/create_class"
 import { Crud_subjects } from "../role/hod/crud_subject"
 import { Crud_course } from "../role/hod/crud_course"
+import { Crud_att } from "../role/hod/crud_att"
 
 export const Hod_dash = () => {
 
@@ -34,6 +35,7 @@ const [get_subject_score ,set_subject_score ] = useState([])
     const [open_classes, set_open_classes] = useState(false)
     const [open_subjects, set_open_subjects] = useState(false)
 const [open_course,set_open_course] = useState(false)
+const [open_att,set_open_att] = useState(false)
     // APIs
 
     const profile = async () => {
@@ -80,6 +82,7 @@ const [open_course,set_open_course] = useState(false)
 
     }
     const course_score = async (course, date) => {
+        console.log(course,date,"of the score fo class")
         try {
             const react = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/course/score/${course}/${date}`, {
                 method: "GET",
@@ -89,6 +92,7 @@ const [open_course,set_open_course] = useState(false)
                 }
             })
             const data = await react.json()
+            console.log(data,"score fo the class")
             set_course_score(data.result[0])
         } catch (error) {
             return console.log(error)
@@ -183,7 +187,7 @@ if(!get_courseId_date.date){
 
 
     const change_course_date = () => {
-        course_score(Number(get_courseId_date.course), get_courseId_date.date)
+        course_score(get_courseId_date.course, get_courseId_date.date)
     }
 
 
@@ -197,6 +201,7 @@ if(!get_courseId_date.date){
         set_open_subjects(false)
                 set_open_classes(false)
 set_open_course(false)
+                set_open_att(false)
 
     }
 
@@ -207,6 +212,7 @@ set_open_course(false)
         set_open_classes(false)
         set_open_subjects(false)
 set_open_course(false)
+                set_open_att(false)
 
 
     }
@@ -218,6 +224,7 @@ set_open_course(false)
         set_open_classes(false)
         set_open_subjects(false)
 set_open_course(false)
+                set_open_att(false)
 
     }
 
@@ -228,6 +235,7 @@ set_open_course(false)
         set_open_classes(true)
         set_open_subjects(false)
         set_open_course(false)
+                set_open_att(false)
 
     }
 
@@ -239,6 +247,7 @@ set_open_course(false)
         set_open_classes(false)
         set_open_subjects(true)
         set_open_course(false)
+                set_open_att(false)
 
     }
 
@@ -249,6 +258,17 @@ const open_course_fun = () =>{
         set_open_classes(false)
         set_open_subjects(false)
         set_open_course(true)
+                set_open_att(false)
+
+}
+const open_att_fun = ()=>{
+      set_open_home(false)
+        set_open_teacher(false)
+        set_open_student(false)
+        set_open_classes(false)
+        set_open_subjects(false)
+        set_open_course(false)
+        set_open_att(true)
 }
 
 
@@ -279,7 +299,6 @@ const open_course_fun = () =>{
                 <div className=" flex flex-col p-2  justify-between overflow-hidden overflow-y-scroll  h-full rounded-2xl bg-white w-full  col-span-1">
 
 
-                    {/* heading name  */}
 
  {/* ================= HEADER ================= */}
     <div className="bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-xl py-4 text-center font-semibold tracking-wide">
@@ -334,6 +353,7 @@ const open_course_fun = () =>{
             </li>
 
             <li
+            onClick={()=>open_att_fun()}
                 className="flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-orange-50 hover:text-orange-500 transition-all"
             >
                 <LuTable size={18}/> Attendance
@@ -427,7 +447,7 @@ const open_course_fun = () =>{
         className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
       />
 
-      <Ok_button text="Apply" onClick={change_course_date} />
+      <Ok_button text="Apply" onClick={()=>change_course_date()} />
     </div>
 
     {/* Present / Total */}
@@ -561,14 +581,23 @@ open_course &&<div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 
 
 }
 
+{/* attendance */}
+
+
+{
+
+open_att && <div className="col-span-4 h-full w-full rounded-2xl bg-slate-100 p-4 overflow-y-auto">
+
+<Crud_att/>
+            </div>
+
+}
+
             </div>
 
 
 
-            <div>
-
-
-            </div>
+            
         </div>
     )
 

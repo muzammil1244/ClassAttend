@@ -70,7 +70,7 @@ export const add_teacher = async (req, res) => {
             });
         }
 
-     
+
 
         let sql = `
       INSERT INTO teacher_db(email,password,name,gender,mobile_number,hod_id)
@@ -115,7 +115,7 @@ export const update_teacher = async (req, res) => {
 
     try {
 
-       
+
 
         let updates = []
         let values = []
@@ -953,45 +953,70 @@ export const get_teacher_subject_by_class = async (req, res) => {
 
 // showing all attendance of the 
 export const show_all_attendance = async (req, res) => {
-    let hod_id = req.user?.id
-    let class_id = req.params?.class
-    let subject_id = req.params?.sub
+    const hod_id = req.user?.id
 
-    if (!hod_id || !class_id || !subject_id) {
+    const class_id = req.query?.class_id
+    const subject_id = req.query?.subject_id
+
+    if (!hod_id) {
         return res.status(401).json({
-            message: "hod id not found here "
+            message: "hod id not found"
         })
     }
 
     try {
 
+        // 🟢 base query (NO group by here)
         let sql = `
-    SELECT
-    att_date AS DATE,
-    COUNT(*) AS total_student,
-    SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) AS present_student
-    FROM att_db 
-WHERE class_id  = ? AND subject_id = ?
-GROUP BY att_date
-    
+            SELECT
+                t.name AS teacher,
+                s.subject AS subject,
+                a.att_date AS DATE,
+                COUNT(*) AS total_student,
+                SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_student
+            FROM att_db a
+            JOIN subject_db s ON s.id = a.subject_id
+            JOIN teacher_db t ON t.id = a.teacher_id
+            WHERE t.hod_id = ?
+        `
 
-    `
-        let [result] = await pool.query(sql, [class_id, subject_id])
+        let values = [hod_id]   // 🟢 hod_id always first
+
+        // 🟢 dynamic filters
+        if (class_id) {
+            sql += ` AND a.class_id = ?`
+            values.push(class_id)
+        }
+
+        if (subject_id) {
+            sql += ` AND a.subject_id = ?`
+            values.push(subject_id)
+        }
+
+        // 🟢 group AFTER filters
+        sql += `
+            GROUP BY a.att_date, t.name, s.subject
+            ORDER BY a.att_date DESC
+        `
+
+        const [result] = await pool.query(sql, values)
 
         return res.status(200).json({
-            message: "data collect successfully",
+            message: "data fetched successfully",
+            filters_applied: {
+                class_id: class_id || null,
+                subject_id: subject_id || null
+            },
             data: result
         })
 
     } catch (error) {
         return res.status(500).json({
             message: "error from hod show all attendance",
-            error
+            error: error.message
         })
     }
-
 }
-
 export const see_particular_day_att = async (req, res) => {
 
     let date = req.params?.date
@@ -1034,41 +1059,76 @@ export const see_particular_day_att = async (req, res) => {
 
 export const download_attendance = async (req, res) => {
 
-    let date = req.params?.date
-    let subject_id = req.params?.sub
-    let class_id = req.params?.class
+    const date = req.params?.date
+    const subject_id = req.params?.sub
+    const class_id = req.params?.class
+
+    const isDownload = req.query?.download === "true"   // 🔥 check download flag
+
     if (!date || !subject_id || !class_id) {
-        return res.stat(401).json({
-            message: "all field is required "
+        return res.status(401).json({
+            message: "all field is required"
         })
     }
 
     try {
 
         let sql = `
-        SELECT
-        s.roll_no , s.name , a.status , a.att_date
-
-        FROM att_db a 
-        JOIN student_db s ON s.id = a.student_id
-        WHERE subject_id = ? AND att_date = ? AND class_id = ?
-        ORDER BY s.roll_no
+            SELECT
+                s.roll_no,
+                s.name,
+                a.status,
+                a.att_date
+            FROM att_db a
+            JOIN student_db s ON s.id = a.student_id
+            WHERE a.subject_id = ? AND a.att_date = ? AND a.class_id = ?
+            ORDER BY s.roll_no
         `
 
         let [result] = await pool.query(sql, [subject_id, date, class_id])
 
-        return res.status(200).json({
-            message: "all data collect successfully",
-            result
-        })
+        // ✅ If NOT download → return JSON
+        if (!isDownload) {
+            return res.status(200).json({
+                message: "all data collect successfully",
+                result
+            })
+        }
+
+        // ===============================
+        // ✅ If download=true → Make CSV
+        // ===============================
+
+        const header = ["Roll No", "Name", "Status", "Date"]
+
+        const rows = result.map(r => [
+            r.roll_no,
+            r.name,
+            r.status,
+            r.att_date.toISOString().split("T")[0]
+        ])
+
+        const csvContent =
+            [header, ...rows]
+                .map(e => e.join(","))
+                .join("\n")
+
+        // 🔥 Important headers for download
+        res.setHeader("Content-Type", "text/csv")
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=attendance_${date}.csv`
+        )
+
+        return res.send(csvContent)
+
     } catch (error) {
         return res.status(500).json({
             message: "err from reading date attend",
-            error
+            error: error.message
         })
     }
 }
-
 
 // Can see particular course attendancely score status
 
@@ -1076,8 +1136,9 @@ export const see_particular_course = async (req, res) => {
 
     let course_id = req.params?.course
     let date = req.params?.date
+    let hod_id = req.user?.id
 
-    if (!course_id || !date) {
+    if (!course_id || !date || !hod_id) {
         return res.status(401).json({
             message: "all field required"
         })
@@ -1088,16 +1149,21 @@ export const see_particular_course = async (req, res) => {
         let sql = `
 
 SELECT 
+    COUNT(*) AS total_student,
 
-COUNT(*) AS total_student,
-SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) AS present_student,
-ROUND(
-SUM(CASE WHEN status = "P" THEN 1 ELSE 0 END) / COUNT(*)  * 100
-) AS percentage
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_student,
+
+    ROUND(
+        SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) * 100.0
+        / COUNT(*), 2
+    ) AS percentage
+
 FROM att_db a
-JOIN class_subject_db cs ON cs.id = a.class_id
-JOIN classes_db c ON c.id = cs.class_id
-WHERE c.course_id = ? AND a.att_date = ?
+
+JOIN classes_db c ON c.id = a.class_id
+
+WHERE c.course_id = ?
+AND a.att_date = ?
 
 
 `
@@ -1127,17 +1193,27 @@ export const see_particular_class = async (req, res) => {
     try {
 
         let sql = `
-        SELECT
-        COUNT(*) AS total_student,
-        SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS present_student,
-ROUND(
-SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END)/COUNT(*)*100
-) AS percentage
-    FROM att_db a
-        JOIN class_subject_db cs ON cs.id = a.class_id
-        JOIN classes_db c ON c.id = cs.class_id
-        JOIN course_db cr ON cr.id = c.course_id
-        WHERE cr.id = ? AND c.id = ? AND a.att_date = ?
+       SELECT
+    COUNT(*) AS total_student,
+
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_student,
+
+    CASE 
+        WHEN COUNT(*) = 0 THEN 0
+        ELSE ROUND(
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) * 100.0
+            / COUNT(*), 2
+        )
+    END AS percentage
+
+FROM att_db a
+
+JOIN classes_db c ON c.id = a.class_id
+JOIN course_db cr ON cr.id = c.course_id
+
+WHERE cr.id = ?
+AND c.id = ?
+AND a.att_date = ?
        
         `
 
@@ -1167,39 +1243,42 @@ export const see_particular_subject = async (req, res) => {
     try {
 
         const sql = `
-        SELECT
-            s.id AS subject_id,
-            s.subject,
-            t.id AS teacher_id,
-            t.name AS name,
+      SELECT
+    s.id AS subject_id,
+    s.subject,
 
-            COUNT(a.student_id) AS total_students,
+    t.id AS teacher_id,
+    t.name AS teacher_name,
 
-            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_students,
+    COUNT(a.student_id) AS total_students,
 
-            CASE 
-                WHEN COUNT(a.student_id) = 0 THEN 0
-                ELSE ROUND(
-                    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END)
-                    / COUNT(a.student_id) * 100
-                )
-            END AS percentage
+    SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) AS present_students,
 
-        FROM class_subject_db cs
-        JOIN classes_db c ON c.id = cs.class_id
-        JOIN course_db cr ON cr.id = c.course_id
-        JOIN subject_db s ON s.id = cs.subject_id
-        JOIN teacher_db t ON t.id = cs.teacher_id
+    CASE 
+        WHEN COUNT(a.student_id) = 0 THEN 0
+        ELSE ROUND(
+            SUM(CASE WHEN a.status = 'P' THEN 1 ELSE 0 END) * 100.0
+            / COUNT(a.student_id), 2
+        )
+    END AS percentage
 
-        LEFT JOIN att_db a 
-            ON a.class_id = cs.id
-            AND a.att_date = ?
+FROM class_subject_db cs
 
-        WHERE cr.id = ?
-        AND c.id = ?
+JOIN classes_db c ON c.id = cs.class_id
+JOIN course_db cr ON cr.id = c.course_id
+JOIN subject_db s ON s.id = cs.subject_id
+JOIN teacher_db t ON t.id = cs.teacher_id
 
-        GROUP BY 
-            s.id, s.subject, t.id, t.name
+LEFT JOIN att_db a 
+    ON a.class_id = c.id          
+    AND a.subject_id = s.id     
+    AND a.teacher_id = t.id      
+    AND a.att_date = ?
+
+WHERE cr.id = ?
+AND c.id = ?
+
+GROUP BY s.id, s.subject, t.id, t.name
         `
 
         // ✅ Correct order
@@ -1295,9 +1374,9 @@ export const see_particular_student = async (req, res) => {
 export const filter_read_student = async (req, res) => {
 
     let hod_id = req.user?.id
-    let course_id = req.query?.course  
-    let class_id = req.query?.class    
-    let search = req.query?.search   
+    let course_id = req.query?.course
+    let class_id = req.query?.class
+    let search = req.query?.search
 
     if (!hod_id) {
         console.log("hod id not found her e")
@@ -1307,7 +1386,7 @@ export const filter_read_student = async (req, res) => {
     try {
 
         let sql = `
-        SELECT 
+      SELECT 
     a.*,
     cl.id AS class_id,
     c.id AS course_id
@@ -1317,11 +1396,13 @@ FROM student_db a
 JOIN classes_db cl ON cl.id = a.class_id
 JOIN course_db c ON c.id = cl.course_id
 
--- HOD validation (important)
-JOIN class_subject_db cs ON cs.class_id = cl.id
-JOIN teacher_db t ON t.id = cs.teacher_id
-
-WHERE t.hod_id = ?
+WHERE EXISTS (
+    SELECT 1
+    FROM class_subject_db cs
+    JOIN teacher_db t ON t.id = cs.teacher_id
+    WHERE cs.class_id = cl.id
+    AND t.hod_id = ?
+)
         `
 
         let values = [hod_id]
@@ -1403,7 +1484,7 @@ export const get_student_report = async (req, res) => {
         const [overall] = await pool.query(overallSql, [student_id]);
 
         // ✅ Subject-wise Attendance
-       const subjectSql = `
+        const subjectSql = `
 SELECT 
     sb.id AS subject_id,
     sb.subject,
@@ -1549,6 +1630,51 @@ GROUP BY a.subject_id, sb.subject
 // can see particular student class score
 export const can_see_particular_class_student_scoreq = (req, res) => {
     return req.send("can see particular  can_see_particular_class_student_scores")
+
+}
+
+export const read_subject_by_classID = async (req, res) => {
+
+    let hod_id = req.user?.id
+    let class_id = req.params?.class
+    if (!hod_id || !class_id) {
+        return res.status(401).json({
+            message: "hod id not founded here for the read"
+        })
+    }
+
+    try {
+
+        let sql = `
+        
+        SELECT s.subject As name , s.id As id 
+
+        FROM class_subject_db cs
+        JOIN subject_db s ON s.id = cs.subject_id
+        JOIN classes_db c ON c.id = cs.class_id
+        JOIN course_db css ON css.id = c.course_id
+        WHERE css.hod_id = ? AND c.id = ?
+
+        `
+
+        let [data] = await pool.query(sql, [hod_id, class_id])
+
+        return res.status(200).json({
+            message: "subjects read successfully ",
+            data: data
+        })
+
+
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: "read err subject",
+            error
+        })
+
+    }
+
 
 }
 

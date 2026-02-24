@@ -3,7 +3,7 @@ import {
         add_classes, add_courses, add_student, add_subject, add_teacher,
         add_teacher_to_subject_and_class, can_see_particular_class_student, delete_classes, delete_courses, delete_student,
         delete_subject, delete_teacher, delete_teacher_subject_assign, download_attendance, filter_read_student, get_student_report, get_students_by_class, get_teacher_subject_by_class, profile, read_classes, read_courses,
-        read_student, read_subject, read_teacher, see_particular_class, see_particular_course,
+        read_student, read_subject, read_subject_by_classID, read_teacher, see_particular_class, see_particular_course,
         see_particular_day_att,
         see_particular_student, see_particular_subject, show_all_attendance,
         update_classes, update_courses, update_student, update_teacher
@@ -52,11 +52,12 @@ hod_route.post("/add/teacher/subject", add_teacher_to_subject_and_class)
 hod_route.get("/read/teacher/subject/:class_id", get_teacher_subject_by_class);
 
 hod_route.delete("/delete/teacher/subject/:id",delete_teacher_subject_assign)
-hod_route.get("/read/all/attendance/:class/:sub", show_all_attendance)
+hod_route.get("/read/all/attendance/", show_all_attendance)
 hod_route.get("/read/particular/attendance/:date/:sub", see_particular_day_att)
-hod_route.get("/download/attendance", download_attendance)
+hod_route.get("/attendance/download/:date/:sub/:class", download_attendance)
 hod_route.get("/course/score/:course/:date", see_particular_course)
 hod_route.get("/class/score/:class/:course/:date", see_particular_class)
 hod_route.get("/subject/score/:class/:course/:date", see_particular_subject)
 hod_route.get("/score/subject/:student",can_see_particular_class_student)
 hod_route.get("/student/score/:student/:roll_no", see_particular_student)
+hod_route.get("/att/class/id/:class", read_subject_by_classID)

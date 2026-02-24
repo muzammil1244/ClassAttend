@@ -95,10 +95,10 @@ export const Crud_course = ({ course_data, reload }) => {
 
             <button
               onClick={handleSubmit}
-              className={`py-3 rounded-xl text-white font-semibold transition-all duration-300
+              className={`py-3 rounded-xl text-black shadow cursor-pointer font-semibold transition-all duration-300
               ${editIndex !== null
                   ? "bg-blue-500 hover:bg-blue-600"
-                  : "bg-orange-300 hover:bg-orange-600"
+                  : "bg-white hover:bg-gray-50"
                 }`}
             >
               {editIndex !== null ? "Update Course" : "Add Course"}

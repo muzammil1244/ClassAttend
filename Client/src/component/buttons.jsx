@@ -1,5 +1,5 @@
 const Ok_button = ({text,onClick})=>{
-    return <button  onClick={onClick} className=" bg-orange-300 cursor-pointer hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-xl ">
+    return <button  onClick={onClick} className=" bg-white shadow cursor-pointer hover:bg-gray-50 text-black font-semibold py-2 px-4 rounded-xl ">
         {text}
     </button>
 }

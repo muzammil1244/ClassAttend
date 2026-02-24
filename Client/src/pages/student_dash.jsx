@@ -136,15 +136,12 @@ att_data()
 
     },[])
 
-console.log("score Data",score_data)
-console.log("Profile Data",profile_data)
-console.log("subject socre data",get_subject_score)
-console.log("att data",get_att_data)
+
    return (
   <div className="min-h-screen bg-gray-50 p-4 md:p-8">
 
     {/* HEADER */}
-   <h1 className="flex items-center gap-3 text-2xl md:text-3xl font-bold text-orange-500 mb-6">
+   <h1 className="flex items-center gap-3 text-2xl md:text-3xl font-bold text-gray-900 mb-6">
   <PiStudentBold className="text-3xl" />
   Student Dashboard
 </h1>
@@ -152,7 +149,7 @@ console.log("att data",get_att_data)
     {/* PROFILE CARD */}
    <div className="bg-white shadow-md rounded-2xl p-5 mb-6 border-l-4 border-orange-400">
   <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-4">
-    <HiOutlineUser className="text-orange-500 text-xl" />
+    <HiOutlineUser className="text-gray-500 text-xl" />
     Student Profile
   </h2>
 
@@ -205,14 +202,14 @@ console.log("att data",get_att_data)
     {/* OVERALL SCORE */}
    <div className="bg-white shadow-md rounded-2xl p-5 mb-6 border-l-4 border-green-400">
   <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-3">
-    <FaChartLine className="text-green-500" />
+    <FaChartLine className="text-gray-500" />
     Overall Performance
   </h2>
 
   <div className="flex items-center justify-between">
     <p className="text-gray-600">Attendance Percentage</p>
 
-    <span className="text-3xl font-bold text-green-500">
+    <span className="text-3xl font-bold text-gray-500">
       {score_data?.overall_percentage
         ? Number(score_data.overall_percentage).toFixed(1)
         : "0"}%
@@ -231,7 +228,7 @@ console.log("att data",get_att_data)
     {/* SUBJECT ATTENDANCE */}
     <div className="mb-6">
   <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-4">
-  <GoChecklist className="text-orange-500" />
+  <GoChecklist className="text-gray-500" />
   Subject Performance
 </h2>
 
@@ -265,7 +262,7 @@ console.log("att data",get_att_data)
           {/* Percentage */}
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">Attendance</span>
-            <span className="text-lg font-bold text-orange-500">
+            <span className="text-lg font-bold text-gray-500">
               {percent.toFixed(1)}%
             </span>
           </div>
@@ -304,7 +301,7 @@ console.log("att data",get_att_data)
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-orange-50 text-gray-700">
+          <thead className="bg-gray-50 text-gray-700">
             <tr>
               <th className="p-3">Subject</th>
               <th className="p-3">Date</th>

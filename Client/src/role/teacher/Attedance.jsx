@@ -122,7 +122,7 @@ console.log(typeof(get_date),"daaaat")
     <div onClick={()=>{
        set_open_cteate_at(true)
        set_attendances(false)
-    }} className="flex justify-center cursor-pointer items-center gap-3 p-3 w-fit h-fit bg-orange-300 hover:bg-orange-500 duration-100 text-white font-bold text-lg rounded-xl">
+    }} className="flex justify-center cursor-pointer items-center gap-2 px-3 py-2 w-fit h-fit bg-white hover:bg-white/30 shadow  duration-100 text-gray-700 font-bold rounded-xl">
        <LuPlus/> Create Attendance
     </div>
    

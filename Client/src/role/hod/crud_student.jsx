@@ -153,7 +153,7 @@ useEffect(()=>{
 
 <h1 className="text-gray-900 font-semibold my-1 text-xl">Search and see Student score</h1>
 
-<div className="w-full h-full bg-white flex flex-col gap-3 py-3 rounded-2xl px-3 shadow ">
+<div className="w-full h-full bg-white flex flex-col gap-3 py-3 rounded-2xl px-3  ">
 
 {/* search student inputs  */}
 <div className="px-4 flex gap-5 py-2 bg-white h-fit rounded shadow ">
@@ -198,8 +198,8 @@ onChange={(e)=>setSearchText(e.target.value)}
 {
 students.length ?
 students.map((item,index)=>(
-<div key={index} className="flex rounded-2xl flex-col my-2 p-5 shadow gap-2 bg-white  h-fit" >
-    <div className="flex justify-between items-center bg-white  rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+<div key={index} className="flex rounded-2xl flex-col my-2  gap-2 bg-white  h-fit" >
+    <div className="flex justify-between items-center  bg-white  rounded-2xl p-5 shadow-sm hover:shadow-md transition">
 
   {/* Left : Student Info */}
   <div className="flex flex-col gap-2">
@@ -282,7 +282,7 @@ selectedStudentReport && (
   <div className="grid grid-cols-6 gap-6">
 
     {/* Overall Attendance Card */}
-    <div className="col-span-2 bg-gradient-to-br from-orange-100 to-orange-200 rounded-3xl p-6 flex flex-col items-center justify-center shadow">
+    <div className="col-span-2 bg-gradient-to-br from-orange-50 to-orange-500 rounded-3xl p-6 flex flex-col items-center justify-center shadow">
 
       <CircleProgress
         value={get_score_data?.overall?.percentage ?? 0}
@@ -306,7 +306,7 @@ selectedStudentReport && (
         get_score_data.subjects.map((sub, index) => (
           <div
             key={index}
-            className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow hover:shadow-md transition"
+            className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-green-500 p-4 rounded-2xl shadow hover:shadow-md transition"
           >
             <CircleProgress value={sub.percentage ?? 0} size={65} />
 

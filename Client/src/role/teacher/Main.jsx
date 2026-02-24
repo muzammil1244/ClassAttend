@@ -74,7 +74,7 @@ export const Main = () => {
                                         {/* Class Name */}
                                         <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
                                             <LuSchool className="text-orange-500" />
-                                            {cls.class_name}
+                                            {cls.class_name} {cls.year}
                                         </h2>
 
                                         {/* Info Section */}
@@ -82,7 +82,7 @@ export const Main = () => {
 
                                             <p className="flex items-center gap-2">
                                                 <LuBookOpen />
-                                                Course: <span className="font-medium"> {cls.course}</span>
+                                                Course: <span className="font-medium"> {cls.course_name}</span>
                                             </p>
 
                                             <p className="flex items-center gap-2">
