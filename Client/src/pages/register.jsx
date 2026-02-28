@@ -1,9 +1,11 @@
 import { useState } from "react"
 import Text_input from "../component/inputfiled"
-import { LuAtSign, LuBuilding, LuLock, LuUser } from "react-icons/lu";
+import { LuAtSign, LuBuilding, LuFileText, LuLock, LuUser } from "react-icons/lu";
 import Ok_button, { Cancel_button } from "../component/buttons";
 import { Succes_Message, Failure_Message } from "../component/message"
 import { useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaLock, FaUser } from "react-icons/fa";
+import { FiBarChart2, FiFileText } from "react-icons/fi";
 export const Register = () => {
 
 
@@ -80,90 +82,164 @@ export const Register = () => {
 
 
 
-  return <div className="h-screen w-screen flex justify-center bg-white items-center">
+return (
+<div className="min-h-screen w-full bg-gray-50 flex justify-center items-center px-4 sm:px-6 py-10 sm:py-0">
 
-    <h1 className=" absolute top-10 text-4xl font-bold text-gray-800 "> <span className="  animate-pulse text-orange-500">Class</span>Attend</h1>
+    {/* Logo */}
+    <h1 className="absolute top-10 text-4xl font-bold text-gray-800">
+      <span className="text-orange-500 animate-pulse">Class</span>Attend
+    </h1>
 
-    <div className="w-fit  p-5 gap-3 flex flex-row justify-around h-fit rounded-2xl  shadow-gray-500 shadow">
-      {/* for inputs  */}
-      <div className="bg-gray-800 h-full p-10 w-full flex justify-center items-center overflow-hidden rounded-2xl">
-        <form onSubmit={register_api} className=" flex flex-col gap-4  bg-gray-800" >
-          <Text_input onChange={(value) => set_register_input((prev) => ({ ...prev, email: value }))} placholder={"email"} name={"email"} type={"email"} lbname={"email"} lbval={<LuAtSign />} />
-          <Text_input onChange={(value) => set_register_input((prev) => ({ ...prev, password: value }))} placholder={"password"} name={"password"} type={"password"} lbname={"password"} lbval={<LuLock />} />
+    {/* Card Container */}
+    <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
 
+      {/* ================= LEFT — FORM ================= */}
+      <div className="p-10 flex flex-col justify-center">
 
-          <Text_input onChange={(value) => set_register_input((prev) => ({ ...prev, name: value }))} placholder={"name"} name={"name"} type={"text"} lbname={"name"} lbval={<LuUser />} />
-          <Text_input onChange={(value) => set_register_input((prev) => ({ ...prev, depname: value }))} placholder={"department"} name={"department"} type={"text"} lbname={"department"} lbval={<LuBuilding />} />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          Create your account
+        </h2>
+        <p className="text-gray-500 mb-6">
+          Start managing attendance digitally in minutes.
+        </p>
 
+        {/* Google Button */}
+        <button className="w-full flex items-center justify-center gap-3 border rounded-lg py-3 hover:bg-gray-100 transition">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5" />
+          Continue with Google
+        </button>
 
-          {/* for buttons */}
-          <div className=" flex gap-4 justify-center items-center   ">
-            {
-              on_spiner ? <div className=" flex justify-center items-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              </div> : <Ok_button type="submit" onClick={register_api} text={"Register"} />
-
-            }
-
-
-
-            <Cancel_button onClick={() => set_register_input({
-              email: "",
-              password: "",
-              name: "",
-              depname: ""
-            })} text={"Cancel"} />
-          </div>
-        </form>
-
-      </div>
-
-
-
-
-
-      {/* for description */}
-
-      <div className="bg-orange-400 rounded-2xl ">
-        <div className=" p-10  w-96 h-full flex flex-col justify-center items-center gap-4 ">
-          <h1 className=" text-3xl font-bold text-white ">Welcome to ClassAttend</h1>
-          <p className=" text-white font-semibold text-center
-        transition-all duration-300 
-        
-        ">Join us today and streamline your class attendance management with ease!</p>
+        {/* Divider */}
+        <div className="flex items-center gap-3 my-6">
+          <div className="h-px bg-gray-200 w-full" />
+          <span className="text-gray-400 text-sm">OR</span>
+          <div className="h-px bg-gray-200 w-full" />
         </div>
+
+        {/* Form */}
+        <form onSubmit={register_api} className="flex flex-col gap-4">
+
+          <Text_input
+            onChange={(v) => set_register_input(p => ({ ...p, email: v }))}
+            placholder="Email"
+            name="email"
+            type="email"
+            lbname="Email"
+            lbval={<LuAtSign />}
+          />
+
+          <Text_input
+            onChange={(v) => set_register_input(p => ({ ...p, password: v }))}
+            placholder="Password"
+            name="password"
+            type="password"
+            lbname="Password"
+            lbval={<LuLock />}
+          />
+
+          <Text_input
+            onChange={(v) => set_register_input(p => ({ ...p, name: v }))}
+            placholder="Full Name"
+            name="name"
+            type="text"
+            lbname="Name"
+            lbval={<LuUser />}
+          />
+
+          <Text_input
+            onChange={(v) => set_register_input(p => ({ ...p, depname: v }))}
+            placholder="Department"
+            name="department"
+            type="text"
+            lbname="Department"
+            lbval={<LuBuilding />}
+          />
+
+          {/* Buttons */}
+          <div className="flex gap-4 mt-4">
+
+            {on_spiner ? (
+              <div className="flex justify-center items-center w-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              </div>
+            ) : (
+              <Ok_button type="submit" text="Register" />
+            )}
+
+            <Ok_button
+              onClick={() =>
+                set_register_input({ email: "", password: "", name: "", depname: "" })
+              }
+              text="Clear"
+            />
+          </div>
+
+        </form>
       </div>
 
+      {/* ================= RIGHT — INFO PANEL ================= */}
+      <div className="bg-gradient-to-br from-orange-500 to-orange-400 text-white p-10 flex flex-col justify-center">
 
+        <h2 className="text-3xl font-bold mb-6">
+          Why ClassAttend?
+        </h2>
 
+        <ul className="space-y-5 text-lg">
+
+          <li className="flex items-center gap-3">
+            <FaCheckCircle /> Instant digital attendance
+          </li>
+
+          <li className="flex items-center gap-3">
+            <FiBarChart2 /> Real-time analytics dashboard
+          </li>
+
+          <li className="flex items-center gap-3">
+            <FiFileText /> Automated report generation
+          </li>
+
+          <li className="flex items-center gap-3">
+            <FaLock /> Saves hours of manual work
+          </li>
+
+          <li className="flex items-center gap-3">
+            <FaUser /> Built for faculty & institutions
+          </li>
+
+        </ul>
+
+        <p className="mt-8 text-white/80">
+          Manage classes smarter, not harder.
+        </p>
+
+      </div>
 
     </div>
 
-    {/* messages  */}
+    {/* ================= ALERTS ================= */}
 
-    {failure_message && <div className="w-screen h-screen absolute ">
-      <Failure_Message ok={() => set_failure_message(false)} heading={"Registration Failed"} message={"Please try again later."} />
-    </div>
+    {failure_message && (
+      <div className="fixed inset-0">
+        <Failure_Message
+          ok={() => set_failure_message(false)}
+          heading="Registration Failed"
+          message="Please try again later."
+        />
+      </div>
+    )}
 
-    }
-
-
-
-    {success_message && <div className="w-screen h-screen absolute ">
-      <Succes_Message cancel={() => set_success_message(false)} heading={"Registration Successful"} message={"You have been registered successfully."} />
-    </div>
-    }
-
-
-
-
-
-
-
-
-
+    {success_message && (
+      <div className="fixed inset-0">
+        <Succes_Message
+          cancel={() => set_success_message(false)}
+          heading="Registration Successful"
+          message="You have been registered successfully."
+        />
+      </div>
+    )}
 
   </div>
+);
 
 
 }

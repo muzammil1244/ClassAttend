@@ -4,9 +4,20 @@ import { SlControlPause, SlLock, SlPhone } from "react-icons/sl"
 import Ok_button, { Cancel_button, Delete_button } from "../../component/buttons"
 import { useEffect, useState } from "react"
 import CircleProgress from "../../component/circle_progress"
+import { FiSearch } from "react-icons/fi";
+ import { MdMenuBook } from "react-icons/md";
+import { FiTrendingUp } from "react-icons/fi";
+import { useNavigate } from "react-router-dom"
 
 export const Crud_Student = ({course}) => {
+      let navigate = useNavigate()
 
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
 const [get_courses,set_courses] = useState([])
 const [get_classes,set_classes] = useState([])
 
@@ -156,42 +167,57 @@ useEffect(()=>{
 <div className="w-full h-full bg-white flex flex-col gap-3 py-3 rounded-2xl px-3  ">
 
 {/* search student inputs  */}
-<div className="px-4 flex gap-5 py-2 bg-white h-fit rounded shadow ">
+<div className="w-full bg-white rounded-2xl  px-5 py-4 flex flex-wrap gap-4 items-center">
 
-<label className="w-full rounded-2xl py-1" htmlFor="">
+  {/* Search Box */}
+  <div className="flex items-center w-[280px] border border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-blue-100 transition">
+    <FiSearch className="text-gray-400 mr-2" size={16} />
+
     <input
-placeholder="search students"
-className="w-full border-gray-100 border-2 py-2 rounded-xl px-3 bg-white"
-type="search"
-value={searchText}
-onChange={(e)=>setSearchText(e.target.value)}
-/>
+      type="search"
+      placeholder="Search students..."
+      className="w-full outline-none text-sm bg-transparent"
+      value={searchText}
+      onChange={(e) => setSearchText(e.target.value)}
+    />
+  </div>
 
-</label>
+  {/* Course Select */}
+  <select
+    onChange={(e) => setSelectedCourse(e.target.value)}
+    className="min-w-[180px] border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-100 outline-none"
+  >
+    <option value="">Select Course</option>
+    {get_courses.length > 0 &&
+      get_courses.map((item, index) => (
+        <option key={index} value={item.id}>
+          {item.name}
+        </option>
+      ))}
+  </select>
 
-<select onChange={(e)=>setSelectedCourse(e.target.value)} className=" rounded-xl p-2 bg-white shadow " name="course" id="">
-<option value="">select course</option>
-{
-    get_courses.length&&get_courses.map((item,index)=>(
-<option key={index}  value={item.id}>{item.name}</option>
-    ))
-}
+  {/* Class Select */}
+  <select
+    onChange={(e) => setSelectedClass(e.target.value)}
+    className="min-w-[200px] border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-100 outline-none"
+  >
+    <option value="">Select Class</option>
+    {get_classes.length > 0 ? (
+      get_classes.map((item, index) => (
+        <option key={index} value={item.id}>
+          {item.class_name} {item.class_year}
+        </option>
+      ))
+    ) : (
+      <option disabled>No Class Found</option>
+    )}
+  </select>
 
-</select>
+  {/* Search Button */}
+  <div className="ml-auto">
+    <Ok_button text={"Search"} onClick={searchStudents} />
+  </div>
 
-<select     onChange={(e)=>setSelectedClass(e.target.value)}
- className=" rounded-xl p-2 bg-white shadow " name="course" id="">
-    <option value="">select course</option>
-
-{
-    get_classes.length?get_classes.map((item,index)=>(
-        <option key={index} value={item.id}>{item.class_name} {item.class_year}</option>
-    )):<option>no class</option>
-}
-
-</select>
-
-<Ok_button text={"Search"} onClick={searchStudents}/>
 </div>
 
 <div className="flex h-full overflow-y-auto flex-col gap-4 ">
@@ -304,19 +330,50 @@ selectedStudentReport && (
 
       {get_score_data?.subjects?.length > 0 ? (
         get_score_data.subjects.map((sub, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-green-500 p-4 rounded-2xl shadow hover:shadow-md transition"
-          >
-            <CircleProgress value={sub.percentage ?? 0} size={65} />
+         
 
-            <div>
-              <p className="font-semibold text-gray-800">{sub.subject}</p>
-              <p className="text-sm text-gray-500">
-                {sub.present ?? 0} / {sub.total_lectures ?? 0}
-              </p>
-            </div>
-          </div>
+<div
+  key={index}
+  className="group flex items-center justify-between 
+             bg-white border border-gray-100
+             p-4 rounded-2xl shadow-sm 
+             hover:shadow-lg hover:-translate-y-1 
+             transition-all duration-300"
+>
+  {/* Left Section */}
+  <div className="flex items-center gap-4">
+    
+    {/* Progress Circle */}
+    <div className="relative">
+      <CircleProgress value={sub.percentage ?? 0} size={65} />
+    </div>
+
+    {/* Subject Info */}
+    <div className="flex flex-col">
+      <p className="font-semibold text-gray-800 text-sm">
+        {sub.subject}
+      </p>
+
+      <p className="text-xs text-gray-500">
+        {sub.present ?? 0} / {sub.total_lectures ?? 0} Lectures
+      </p>
+    </div>
+  </div>
+
+  {/* Right Section */}
+  <div className="flex flex-col items-end gap-2">
+    
+    {/* Percentage */}
+    <span className="text-sm font-bold text-green-600">
+      {sub.percentage ?? 0}%
+    </span>
+
+    {/* Icon Badge */}
+    <div className="p-2 rounded-lg bg-green-50 text-green-600">
+      <MdMenuBook size={18} />
+    </div>
+  </div>
+</div>
         ))
       ) : (
         <p className="text-gray-400">No subjects found</p>

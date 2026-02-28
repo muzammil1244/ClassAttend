@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
-export const AddStudent =({item ,updateData}) =>{
+import { LuLoader, LuUserPlus } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
+export const AddStudent =({item ,updateData}) =>{
+      let navigate = useNavigate()
+
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -103,103 +113,141 @@ var mth = "POST"
 
 }, [updateData, item]);
   return (
-    <div className="min-h-screen bg-orange-50 overflow-hidden flex items-center justify-center">
+     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
 
-      {/* CARD */}
-      <div className="w-[420px] bg-white shadow-xl overflow-hidden rounded-2xl p-8 border border-orange-100">
+    {/* CARD */}
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
 
-        <h2 className="text-2xl font-bold text-orange-500 mb-6 text-center">
-        {update?"Update Student":"Add Student"}  
-        </h2>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="bg-orange-100 text-orange-500 p-3 rounded-xl">
+          <LuUserPlus size={22} />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            {update ? "Update Student" : "Add New Student"}
+          </h2>
+          <p className="text-xs text-gray-400">
+            Fill student information below
+          </p>
+        </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      {/* FORM */}
+      <form onSubmit={handleSubmit} className="space-y-4">
 
+        {/* Name */}
+        <div>
+          <label className="text-xs text-gray-500">Student Name</label>
           <input
             type="text"
             name="name"
-            placeholder="Student Name"
             value={form.name}
             onChange={handleChange}
-            className="w-full border border-orange-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full mt-1 border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
           />
+        </div>
 
+        {/* Email */}
+        <div>
+          <label className="text-xs text-gray-500">Email Address</label>
           <input
             type="email"
             name="email"
-            placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="w-full border border-orange-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full mt-1 border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
           />
+        </div>
 
+        {/* Password */}
+        <div>
+          <label className="text-xs text-gray-500">
+            {update ? "New Password (optional)" : "Password"}
+          </label>
           <input
             type="password"
             name="password"
-            placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full border border-orange-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full mt-1 border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
           />
+        </div>
 
+        {/* Roll No */}
+        <div>
+          <label className="text-xs text-gray-500">Roll Number</label>
           <input
             type="text"
             name="roll_no"
-            placeholder="Roll Number"
             value={form.roll_no}
             onChange={handleChange}
-            className="w-full border border-orange-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full mt-1 border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
           />
+        </div>
 
+        {/* Class ID (Disabled) */}
+        <div>
+          <label className="text-xs text-gray-500">Class ID</label>
           <input
             type="text"
             name="class_id"
-            placeholder="Class ID"
             value={form.class_id}
-            onChange={handleChange}
-            className="w-full border border-orange-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            disabled
+            className="w-full mt-1 border border-gray-100 bg-gray-100 p-3 rounded-lg text-gray-500"
           />
+        </div>
 
-          {/* BUTTON */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full p-3 rounded-lg text-white font-semibold transition
-            ${loading
+        {/* BUTTON */}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all
+            ${
+              loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-orange-500 hover:bg-orange-600"
-              }`}
+                : "bg-orange-500 hover:bg-orange-600 text-white shadow-md"
+            }`}
+        >
+          {loading && <LuLoader className="animate-spin" size={18} />}
+          {update
+            ? loading
+              ? "Updating..."
+              : "Update Student"
+            : loading
+            ? "Adding..."
+            : "Add Student"}
+        </button>
+
+      </form>
+    </div>
+
+    {/* SUCCESS MODAL */}
+    {success && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-[340px] text-center">
+
+          <div className="text-green-500 text-3xl mb-3">✔</div>
+
+          <h3 className="text-lg font-bold text-gray-800 mb-2">
+            Success
+          </h3>
+
+          <p className="text-gray-500 mb-6 text-sm">
+            Student {update ? "updated" : "added"} successfully.
+          </p>
+
+          <button
+            onClick={() => setSuccess(false)}
+            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg"
           >
-            {loading ? "Adding..." : "Add Student"}
+            Close
           </button>
 
-        </form>
-      </div>
-
-      {/* ✅ SUCCESS POPUP */}
-      {success && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/30">
-
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-[320px] text-center border border-green-200">
-
-            <h3 className="text-xl font-bold text-green-500 mb-3">
-              ✅ Success
-            </h3>
-
-            <p className="text-gray-600 mb-6">
-              Student <span>{update?"Updated":"Added"}</span> Successfully!
-            </p>
-
-            <button
-              onClick={() => setSuccess(false)}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg"
-            >
-              OK
-            </button>
-
-          </div>
         </div>
-      )}
-
-    </div>
+      </div>
+    )}
+  </div>
   );
 }

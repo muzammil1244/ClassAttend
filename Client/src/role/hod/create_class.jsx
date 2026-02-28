@@ -8,19 +8,26 @@ import { DraggableTeacher } from "../../component/dragable"
 import { DraggableSubject } from "../../component/dragaleSubject"
 import { AssignDropZone } from "../../component/Assign"
 import { RxCross1 } from "react-icons/rx";
+import { useActionState } from "react"
+import { Succes_Message } from "../../component/message"
+import { useNavigate } from "react-router-dom"
 
 export const Create_Classes = ({ class_data, setOpen_manage_class }) => {
+    let navigate = useNavigate()
 
-    useEffect(() => {
-        set_student_data((prev) => ({ ...prev, class_id: class_data.id }))
-        setSelectedClass(class_data.id)
-        set_class_data((prev) => ({ ...prev, name: class_data.class_name, year: class_data.class_year, course_id: class_data.course_id }))
-   read_assigned(class_data.id)
-   set_delete_subject_teacher_assign(true)
-   set_delete_assign_id(class_data.id)
-    }, [class_data])
+   useEffect(()=>{
+    setTimeout(() => {
+        
+    }, 5000);
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
 
-// ////////////////////////////////////////////////////////////////////////////////////
+
+
+    // ////////////////////////////////////////////////////////////////////////////////////
 
     const [get_course, set_course] = useState([])
 
@@ -49,11 +56,44 @@ export const Create_Classes = ({ class_data, setOpen_manage_class }) => {
     // Final array (jo tum backend me bhejoge)
     const [finalAssign, setFinalAssign] = useState([]);
     const [activeItem, setActiveItem] = useState(null);
-    const [acitve_delete_subject_teacher_assign,set_delete_subject_teacher_assign] = useState(false)
-const [delete_assign_id,set_delete_assign_id] = useState(null)
+    const [acitve_delete_subject_teacher_assign, set_delete_subject_teacher_assign] = useState(false)
+    const [delete_assign_id, set_delete_assign_id] = useState(null)
 
-const [update_active , set_update_active] = useState(false)
-const [update_student_data , set_update_student_data] = useState(null)                                            
+    const [update_active, set_update_active] = useState(false)
+    const [update_student_data, set_update_student_data] = useState(null)
+
+const [isCreated, setIsCreated] = useState(false);   // new class banne ke baad true
+const [isEditMode, setIsEditMode] = useState(false); // props se aaye to true
+
+    const [show_message, set_show_message] = useState(false)
+
+
+ useEffect(() => {
+    if (class_data) {
+        setIsEditMode(true);     // update mode
+        setIsCreated(false);     // blur disable
+
+        set_student_data((prev) => ({ ...prev, class_id: class_data.id }))
+        setSelectedClass(class_data.id)
+
+        set_class_data({
+            name: class_data.class_name,
+            year: class_data.class_year,
+            course_id: class_data.course_id
+        })
+
+        read_assigned(class_data.id)
+        set_delete_subject_teacher_assign(true)
+        set_delete_assign_id(class_data.id)
+    }
+}, [class_data])
+
+useEffect(() => {
+    if (!class_data) {
+        setIsEditMode(false);
+    }
+}, [class_data])
+
     // API fetching ////////////////////////////////////////////////////////////////////////////////////////////
 
     let token = localStorage.getItem("token")
@@ -84,6 +124,7 @@ const [update_student_data , set_update_student_data] = useState(null)
 
         if (!get_class_data.name || !get_class_data.year || !get_class_data.course_id) {
             alert("all filed required")
+            return false
         }
 
         try {
@@ -105,9 +146,12 @@ const [update_student_data , set_update_student_data] = useState(null)
                 console.log("data not fetch properly")
             }
             const result = await data.json(); // 🔥 YAHI MAIN CHEEZ HAI
-
             set_student_data((prev) => ({ ...prev, class_id: result.data?.id }))
             setSelectedClass(result.data?.id)
+            set_show_message(true)
+            setIsCreated(true);
+setIsEditMode(false);   // 👈 VERY IMPORTANT
+
         } catch (error) {
             return console.log(error)
         }
@@ -139,9 +183,9 @@ const [update_student_data , set_update_student_data] = useState(null)
             if (!data.ok) {
                 console.log("data not fetch properly")
             }
-set_student_data({
-    email: '', password: "", name: "", roll_no: "", class_id: get_student_data.class_id
-})
+            set_student_data({
+                email: '', password: "", name: "", roll_no: "", class_id: get_student_data.class_id
+            })
             searchStudents()
 
 
@@ -151,7 +195,7 @@ set_student_data({
 
     }
 
-    
+
 
 
     const searchStudents = async () => {
@@ -235,101 +279,77 @@ set_student_data({
         setActiveItem(active.data.current);
     };
 
-const read_assigned = async (class_id) => {
+    const read_assigned = async (class_id) => {
 
-    try {
-        const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/teacher/subject/${class_id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        })
+        try {
+            const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/read/teacher/subject/${class_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })
 
-        const data = await res.json()
-setFinalAssign(data.data)
-   } catch (err) {
-        console.log("Fetch error:", err)
-    }
-}
-
-
-const delete_subject_teacher_assign = async () => {
-
-    if (!delete_assign_id) {
-        alert("No class selected for deletion");
-        return;
-    }
-    try {
-        const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/subject/${delete_assign_id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        })
-        const data = await res.json()
-        console.log("delete response", data)
-        if (data.success) {
-            alert("Previous assignments deleted. You can now add new assignments.");
-            setFinalAssign([]);
+            const data = await res.json()
+            setFinalAssign(data.data)
+        } catch (err) {
+            console.log("Fetch error:", err)
         }
-    } catch (error) {
-        console.log("Error deleting assignments:", error);
     }
-  
-}
 
-const delete_students = async (student_id) => {
 
-    try {
-        const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/student/${student_id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        })
-        const data = await res.json()
-        console.log("delete response", data)
-      
+
+
+    const delete_students = async (student_id) => {
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/student/${student_id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            const data = await res.json()
+            console.log("delete response", data)
+
             searchStudents();
-    } catch (error) {
-        console.log("Error deleting student:", error);
+        } catch (error) {
+            console.log("Error deleting student:", error);
+        }
     }
-}
 
-const   update_student_data_fun = async (e) => {
-  e.preventDefault();  
+    const update_student_data_fun = async (e) => {
+        e.preventDefault();
 
-  console.log("data to update", update_student_data)
-  if (!update_student_data.name || !update_student_data.email || !update_student_data.password || !update_student_data.roll_no) {
-    alert("all filed required")
-    return false
-  } 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/update/student/${update_student_data.id}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(get_student_data)
-    })
-    const data = await res.json()
-    console.log("update response", data)
+        console.log("data to update", update_student_data)
+        if (!update_student_data.name || !update_student_data.email || !update_student_data.password || !update_student_data.roll_no) {
+            alert("all filed required")
+            return false
+        }
+        try {
+            const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/update/student/${update_student_data.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(get_student_data)
+            })
+            const data = await res.json()
+            console.log("update response", data)
 
-    searchStudents()
-
-    
-  } catch (error) {
-    return console.log("Error updating student:", error);
-  }
-}
- 
+            searchStudents()
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+        } catch (error) {
+            return console.log("Error updating student:", error);
+        }
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
         if (pendingAssign.teacher && pendingAssign.subject) {
 
@@ -355,44 +375,39 @@ const   update_student_data_fun = async (e) => {
 
     // Submit data ok
 
-   const submit_assigned = async () => {
+    const submit_assigned = async () => {
 
-    if (finalAssign.length === 0) {
-        alert("Add teacher and subjects");
-        return;
-    }
-
-    const payload = finalAssign.map(item => ({
-        class_id: selectedClass,
-        teacher_id: item.teacher_id,
-        subject_id: item.subject_id
-    }));
-
-    console.log("Sending payload:", payload);
-
-    try {
-        const response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/add/teacher/subject`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            console.log("Server error:", result);
+        if (finalAssign.length === 0) {
+            alert("Add teacher and subjects");
             return;
         }
 
-        console.log("Success:", result);
+        const payload = finalAssign.map(item => ({
+            class_id: selectedClass,
+            teacher_id: item.teacher_id,
+            subject_id: item.subject_id
+        }));
 
-    } catch (error) {
-        console.log("Fetch error:", error);
-    }
-};
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_DOMAIN}/hod/add/teacher/subject`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const result = await response.json();
+            console.log(result);
+set_show_message(true)
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
 
     useEffect(() => {
@@ -412,14 +427,15 @@ const   update_student_data_fun = async (e) => {
         {/* headers */}
 
         <div className="  shadow w-fit h-fit bg-gray-900  rounded-2xl ">
-            <h2 className="text-sm font-semibold text-white px-4 py-2">Add OR Update classes </h2>
-        </div>
+<h2 className="text-sm font-semibold text-white px-4 py-2">
+    {isEditMode ? "Update Class" : "Create Class"}
+</h2>     </div>
 
 
         {/* create classes  */}
 
-        <div className="w-full h-fit py-5 bg-white shadow rounded-2xl px-5">
-
+<div className={`w-full h-fit py-5 bg-white shadow rounded-2xl px-5 transition-all duration-300
+${isCreated ? "bg-white/30 backdrop-blur-[50px]  pointer-events-none opacity-60" : ""}`}>
 
 
 
@@ -447,8 +463,11 @@ const   update_student_data_fun = async (e) => {
 
                 </label>
 
-                <Ok_button onClick={add_class} text={"Create"} />
-            </form>
+<Ok_button
+    onClick={add_class}
+    text={"Create"}
+    disabled={isCreated && !isEditMode}
+/>            </form>
 
         </div>
 
@@ -480,16 +499,16 @@ const   update_student_data_fun = async (e) => {
                         </label>
 
 
-{
-    !update_active?
-        <Ok_button onClick={add_student} text={"Create"} /> :
-        <Ok_button onClick={update_student_data_fun} text={"Update"}/>
-}
-                    
+                        {
+                            !update_active ?
+                                <Ok_button onClick={add_student} text={"Create"} /> :
+                                <Ok_button onClick={update_student_data_fun} text={"Update"} />
+                        }
+
                     </form>
                 </div>
 
-                <div className="w-full flex flex-col gap-4 py-10 items-center overflow-y-scroll justify-center h-80  bg-white shadow rounded-2xl">
+                <div className="w-full flex flex-col gap-4  items-center overflow-y-scroll justify-center h-80  bg-white shadow rounded-2xl">
                     {
                         get_student.length === 0 ? (
                             <p>No Students Found</p>
@@ -513,13 +532,13 @@ const   update_student_data_fun = async (e) => {
                                     </div>
 
                                     <div className="flex gap-4">
-                                        <Ok_button onClick={()=>{
+                                        <Ok_button onClick={() => {
                                             set_update_active(true)
                                             set_update_student_data(item)
-                                              set_student_data((prev) => ({ ...prev, name:item.name , email:item.email, password:item.password,roll_no:item.roll_no,class_id:item.class_id}))
+                                            set_student_data((prev) => ({ ...prev, name: item.name, email: item.email, password: item.password, roll_no: item.roll_no, class_id: item.class_id }))
 
-                                            }} text={"Update"} />
-                                        <Delete_button onClick={()=>delete_students( item.id)} text={"Delete"} />
+                                        }} text={"Update"} />
+                                        <Delete_button onClick={() => delete_students(item.id)} text={"Delete"} />
                                     </div>
 
                                 </div>
@@ -633,15 +652,24 @@ const   update_student_data_fun = async (e) => {
             </div>
 
             <div className="w-full flex gap-3 items-center">
-               {
-                acitve_delete_subject_teacher_assign &&<Delete_button onClick={() => delete_subject_teacher_assign()} text={"DELETE"} />
-                
-             
-               }    <Ok_button onClick={() => submit_assigned()} text={"Submit"} /> <Cancel_button onClick={() => setFinalAssign([])} text={"Reset"} />
+                <Ok_button onClick={() => submit_assigned()} text={acitve_delete_subject_teacher_assign ? "Update" : "Submit"} /> <Cancel_button onClick={() => setFinalAssign([])} text={"Reset"} />
             </div>
         </div>
 
-
+{
+    show_message&&  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            
+                <div className="animate-scaleIn">
+                  <Succes_Message
+                  cancel={()=>set_show_message(false)}
+                  heading={"Create Class successfully"}
+                  message={"class has been create successfully"}
+                
+                  />
+                </div>
+            
+              </div>
+}
 
 
 

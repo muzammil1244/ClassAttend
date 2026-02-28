@@ -79,78 +79,152 @@ console.log("Decoded:", decoded);
     }, [get_role])
 
 
-    return (
-        <div className="bg-white w-screen h-screen flex justify-center items-center">
-            <h1 className=" absolute top-10 text-4xl font-bold text-gray-800 "> <span className="  animate-pulse text-orange-500">Class</span>Attend</h1>
+   return (
+<div className="min-h-screen w-full bg-gray-50 flex justify-center items-center px-4 sm:px-6 py-10 sm:py-0">
+    {/* Logo */}
+<h1 className="absolute sm:top-10 top-4 text-2xl sm:text-4xl font-bold text-gray-800">
+        <span className="text-orange-500 animate-pulse">Class</span>Attend
+    </h1>
 
-            <div className="w-fit  p-5 gap-3 flex flex-row justify-around h-fit rounded-2xl  shadow-gray-500 shadow">
-                {/* for inputs */}
-                <div className="bg-gray-800 h-full p-10 w-full flex justify-center items-center overflow-hidden rounded-2xl">
+    {/* Main Card */}
+<div className="w-full max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl grid md:grid-cols-2 overflow-hidden">
+      {/* ================= LEFT — LOGIN FORM ================= */}
+<div className="p-6 sm:p-10 flex flex-col justify-center">
+<h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">          Welcome Back 👋
+        </h2>
+        <p className="text-gray-500 mb-6">
+          Login to continue managing attendance.
+        </p>
 
-                    <form className=" w-full flex h-full flex-col justify-center gap-5" onSubmit={login_fun}>
-                        <div className=" w-full flex gap-2 justify-around items-center h-full">
-                            <LuUserRound className="text-white" />
-                            <select value={get_role} onChange={(e) => set_role(e.target.value)} className=" outline-orange-500 w-full bg-white hover:bg-white border-1 rounded-xl p-2 text-center 
-  font-semibold
-    " name="Role" id="role">
+        <form className="flex flex-col gap-5" onSubmit={login_fun}>
 
-                                <option value="hod">HOD</option>
-                                <option value="teacher">teacher</option>
-                                <option value="student">student</option>
+          {/* Role Selector */}
+<div className="flex items-center gap-3 border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50">            <LuUserRound className="text-gray-500" />
 
-                            </select>
-                        </div>
-
-
-                        {/* for hod and teacher  */}
-
-
-                        {
-                            get_role === "hod" || get_role === "teacher" ? <div className="flex flex-col gap-3">
-                                <Text_input value={get_data.email} onChange={(value) => set_data((prev) => ({ ...prev, email: value }))} placholder={"email"} name={"email"} type={"email"} lbname={"email"} lbval={<LuAtSign />} />
-                                <Text_input value={get_data.password} onChange={(value) => set_data((prev) => ({ ...prev, password: value }))} placholder={"password"} name={"password"} type={"password"} lbname={"password"} lbval={<LuLock />} />
-                            </div> : <div className="flex flex-col gap-3">
-                                <Text_input value={get_data.email} onChange={(value) => set_data((prev) => ({ ...prev, email: value }))} placholder={"student email"} name={"email"} type={"text"} lbname={"name"} lbval={<LuUser />} />
-                                <Text_input value={get_data.password} onChange={(value) => set_data((prev) => ({ ...prev, password: value }))} placholder={"password"} name={"password]"} type={"text"} lbname={"role"} lbval={<LuUserRound />} />
-                            </div>
-                        }
-
-
-{
-    on_spiner ? <div className="w-full h-full flex justify-center items-center"><Spiner/></div>:<Ok_button onClick={login_fun} text={"Login"} />
-
-}
-                    </form>
-
-                </div>
-
-                {/* for descriptions */}
-                <div className="bg-orange-400 rounded-2xl ">
-        <div className=" p-10  w-96 h-full flex flex-col justify-center items-center gap-4 ">
-          <h1 className=" text-3xl font-bold text-white ">Welcome to Login</h1>
-          <ul className= " text-left text-[15px] text-white font-semibold  ">
-            <li>Select your role first.</li>
-             <li>Enter all required details based on your role.</li>
-              <li>Do not leave any field blank</li>
-          </ul>
+            <select
+              value={get_role}
+              onChange={(e) => set_role(e.target.value)}
+              className="bg-transparent outline-none w-full font-semibold text-gray-700"
+            >
+              <option value="hod">Head of Department</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
           </div>
+
+          {/* Inputs Based on Role */}
+          {get_role === "hod" || get_role === "teacher" ? (
+            <>
+              <Text_input
+                value={get_data.email}
+                onChange={(v) => set_data(p => ({ ...p, email: v }))}
+                placholder="Email Address"
+                name="email"
+                type="email"
+                lbname="Email"
+                lbval={<LuAtSign />}
+              />
+
+              <Text_input
+                value={get_data.password}
+                onChange={(v) => set_data(p => ({ ...p, password: v }))}
+                placholder="Password"
+                name="password"
+                type="password"
+                lbname="Password"
+                lbval={<LuLock />}
+              />
+            </>
+          ) : (
+            <>
+              <Text_input
+                value={get_data.email}
+                onChange={(v) => set_data(p => ({ ...p, email: v }))}
+                placholder="Student Email"
+                name="email"
+                type="text"
+                lbname="Student"
+                lbval={<LuUser />}
+              />
+
+              <Text_input
+                value={get_data.password}
+                onChange={(v) => set_data(p => ({ ...p, password: v }))}
+                placholder="Password"
+                name="password"
+                type="password"
+                lbname="Password"
+                lbval={<LuLock />}
+              />
+            </>
+          )}
+
+          {/* Login Button */}
+          {on_spiner ? (
+            <div className="flex justify-center py-3">
+              <Spiner />
+            </div>
+          ) : (
+            <Ok_button onClick={login_fun} text={"Login"} />
+          )}
+
+        </form>
       </div>
-            </div>
-            {failure_message && <div className="w-screen h-screen absolute ">
-                <Failure_Message ok={() => set_failure_message(false)} heading={"Login Failed"} message={"Please try again later."} />
-            </div>
 
-            }
-            {all_filed_err && <div className="w-screen h-screen absolute ">
-                <Failure_Message ok={() => set_failure_message(false)} heading={"Login Failed"} message={"Please try again later."} />
-            </div>
+      {/* ================= RIGHT — INFO PANEL ================= */}
+<div className="hidden md:flex bg-gradient-to-br from-orange-500 to-orange-400 text-white p-10 flex-col justify-center">
+        <h2 className="text-3xl font-bold mb-6">
+          Smart Academic Control
+        </h2>
 
-            }
+<ul className="space-y-4 text-base lg:text-lg">
+            <li className="flex gap-3 items-center">
+            📊 Track attendance instantly
+          </li>
+          <li className="flex gap-3 items-center">
+            🧑‍🏫 Role-based dashboards
+          </li>
+          <li className="flex gap-3 items-center">
+            📁 Auto-generated reports
+          </li>
+          <li className="flex gap-3 items-center">
+            ⏱ Save administrative time
+          </li>
+          <li className="flex gap-3 items-center">
+            🎯 Built for colleges & schools
+          </li>
+        </ul>
 
+        <p className="mt-8 text-white/80">
+          One platform for HOD, Teachers, and Students.
+        </p>
+      </div>
 
+    </div>
 
+    {/* ================= ALERTS ================= */}
 
-        </div>
-    )
+    {failure_message && (
+<div className="fixed inset-0 flex items-center justify-center p-4">
+          <Failure_Message
+          ok={() => set_failure_message(false)}
+          heading="Login Failed"
+          message="Please check your credentials."
+        />
+      </div>
+    )}
+
+    {all_filed_err && (
+      <div className="fixed inset-0">
+        <Failure_Message
+          ok={() => set_all_filed_err(false)}
+          heading="Missing Fields"
+          message="Please fill all required fields."
+        />
+      </div>
+    )}
+
+  </div>
+);
 }
 

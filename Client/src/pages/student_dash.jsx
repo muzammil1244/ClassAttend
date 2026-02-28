@@ -13,8 +13,16 @@ import { MdOutlineClass, MdOutlineDateRange } from "react-icons/md";
 import { FaBookOpen, FaChartLine } from "react-icons/fa";
 
 import { GoChecklist } from "react-icons/go";
+import { useNavigate } from "react-router-dom";
 export const Student_dash = ()=>{
+      let navigate = useNavigate()
 
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
     const [profile_data , set_profile_data] = useState({})
     const [score_data,set_score_data] = useState({})
 const [get_subject_score,set_subject_score] = useState([])

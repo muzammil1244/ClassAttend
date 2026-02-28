@@ -838,69 +838,59 @@ export const read_subject = async (req, res) => {
 
 // ADDITIONAL FEATURE OF HOD
 
-export const add_teacher_to_subject_and_class = async (req, res) => {
-    const assignments = req.body; // expecting array
+export const sync_teacher_subject_assign = async (req, res) => {
+    const assignments = req.body;
 
     if (!Array.isArray(assignments) || assignments.length === 0) {
-        return res.status(400).json({
-            message: "Assignments array required"
-        });
+        return res.status(400).json({ message: "Assignments required" });
     }
 
+    const connection = await pool.getConnection();
+
     try {
-        // Prepare values for bulk insert
-        const values = assignments.map(item => [
-            item.class_id,
-            item.subject_id,
-            item.teacher_id
+        await connection.beginTransaction();
+
+        const class_id = assignments[0].class_id;
+
+        // Current UI pairs
+        const pairs = assignments.map(a => [a.subject_id, a.teacher_id]);
+
+        const placeholders = pairs.map(() => "(?, ?)").join(",");
+
+        // ✅ STEP 1: Remove Unchecked mappings
+        const deleteSql = `
+            DELETE FROM class_subject_db
+            WHERE class_id = ?
+            AND (subject_id, teacher_id) NOT IN (${placeholders})
+        `;
+
+        await connection.query(deleteSql, [class_id, ...pairs.flat()]);
+
+        // ✅ STEP 2: Insert only new mappings
+        const insertValues = assignments.map(a => [
+            a.class_id,
+            a.subject_id,
+            a.teacher_id
         ]);
 
-        const sql = `
-            INSERT INTO class_subject_db (class_id, subject_id, teacher_id)
-            VALUES ?
-        `;
+        await connection.query(
+            `INSERT IGNORE INTO class_subject_db
+             (class_id, subject_id, teacher_id)
+             VALUES ?`,
+            [insertValues]
+        );
 
-        const [data] = await pool.query(sql, [values]);
+        await connection.commit();
 
-        return res.status(200).json({
-            message: "Teachers + Subjects assigned successfully",
-            insertedRows: data.affectedRows
-        });
+        return res.json({ success: true, message: "Assignments synced" });
 
-    } catch (error) {
-        return res.status(500).json({
-            message: "Bulk insert error",
-            error: error.message
-        });
+    } catch (err) {
+        await connection.rollback();
+        return res.status(500).json({ error: err.message });
+    } finally {
+        connection.release();
     }
 };
-
-
-
-
-export const delete_teacher_subject_assign = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const sql = `
-        DELETE FROM class_subject_db
-
-        WHERE class_id = ?
-        `;
-
-        const [data] = await pool.query(sql, [id]);
-        return res.status(200).json({
-            message: "Assignment deleted successfully",
-            data
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Error deleting assignment",
-            error
-
-        });
-    }
-};
-
 
 export const get_teacher_subject_by_class = async (req, res) => {
     const { class_id } = req.params;

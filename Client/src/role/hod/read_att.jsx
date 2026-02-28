@@ -1,9 +1,17 @@
 
 import { LuAtSign, LuSearch, LuBookOpen, LuDownload, LuArrowLeft } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 
 export const Read_att = ({item,onclick,onDownload }) => {
+        let navigate = useNavigate()
 
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
     console.log(item)
 
 

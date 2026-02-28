@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react"
 import { Read_att } from "./read_att"
+import { useNavigate } from "react-router-dom"
 
 
 export const Crud_att = () => {
+    let navigate = useNavigate()
 
 
-
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
     // use States
 
     const [get_courses, set_courses] = useState([])
-    const [selected_course_id, set_selected_course_id] = useState(0)
-    const [selected_class_id, set_selected_class_id] = useState(0)
+    const [selected_course_id, set_selected_course_id] = useState(null)
+    const [selected_class_id, set_selected_class_id] = useState(null)
     const [get_classes, set_classes] = useState([])
     const [get_subjects, set_subjects] = useState([])
-    const [selected_subject_id, set_select_subject_id] = useState(0)
+    const [selected_subject_id, set_select_subject_id] = useState(null)
     const [get_att, set_att] = useState([])
     const [open_read_att, set_open_read_att] = useState(false)
     const [open_all_att, set_open_all_att ]= useState(true)
@@ -73,7 +80,7 @@ const[ get_particular_att ,set_particular_att] = useState([])
     }
 
     const read_classes = async () => {
-        if (selected_course_id == null) {
+        if (!selected_course_id ) {
             console.log("course id not found ", selected_course_id)
             return false
         }
@@ -192,7 +199,7 @@ set_particular_att(data)
 
     useEffect(() => {
 
-        if (selected_class_id !== 0) {
+        if (selected_class_id ) {
             read_subjects()
 
         }
@@ -212,7 +219,7 @@ set_particular_att(data)
 
     useEffect(() => {
 
-        if (selected_subject_id !== 0) {
+        if (selected_subject_id) {
             read_att()
 
 
@@ -241,7 +248,7 @@ set_particular_att(data)
                     <div className="flex gap-4 flex-wrap">
 
                         <select
-                            onChange={(e) => set_selected_course_id(e.target.value)}
+                            onChange={(e) => set_selected_course_id(Number(e.target.value))}
                             className="border border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
                             <option value="">Select Course</option>
@@ -253,7 +260,7 @@ set_particular_att(data)
                         </select>
 
                         <select
-                            onChange={(e) => set_selected_class_id(e.target.value)}
+                            onChange={(e) => set_selected_class_id(Number(e.target.value))}
                             className="border border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
                             <option value="">Select Class</option>
@@ -329,7 +336,6 @@ set_particular_att(data)
                     onclick={() => {
                         set_open_all_att(true)
                         set_open_read_att(false)
-                        set_att([])
                     }}
                     onDownload={handleDownload}
                 />

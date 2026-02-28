@@ -6,8 +6,18 @@ import {
   LuCalendarDays,
   LuDownload,
 } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 export const Read_att = (item) => {
+    let navigate = useNavigate()
+
+
+  useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
   const [students, set_students] = useState([]);
   const [loading, set_loading] = useState(true);
   const [download, set_download] = useState(false);
@@ -89,12 +99,13 @@ export const Read_att = (item) => {
   }
 
   return (
-    <div className="w-full h-full bg-gray-50 rounded-2xl p-6">
+    <div className="w-full h-full overflow-y-hidden bg-gray-50 rounded-2xl p-4 md:p-1">
 
       {/* HEADER */}
       {students[0] && (
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
+<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+  
+            <div className="flex items-center gap-3">
             <div className="bg-white shadow p-3 rounded-xl">
               <LuCalendarDays className="text-black text-xl" />
             </div>
@@ -109,8 +120,7 @@ export const Read_att = (item) => {
 
           <button
             onClick={() => set_download(true)}
-            className="flex items-center gap-2 bg-white text-gray-600 px-4 py-2 rounded-xl hover:bg-slate-50  cursor-pointer transition"
-          >
+className="flex items-center justify-center gap-2 w-full md:w-auto bg-white text-gray-600 px-4 py-2 rounded-xl hover:bg-slate-50 transition"          >
             <LuDownload size={18} />
             Download CSV
           </button>
@@ -118,7 +128,7 @@ export const Read_att = (item) => {
       )}
 
       {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <StatCard icon={<LuUsers />} label="Total Students" value={total} />
         <StatCard icon={<LuUserCheck />} label="Present" value={present} highlight />
         <StatCard icon={<LuUserX />} label="Absent" value={absent} danger />
@@ -126,34 +136,66 @@ export const Read_att = (item) => {
 
       {/* TABLE */}
       <div className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
-        <div className="grid grid-cols-4 bg-white px-6 py-4 text-sm font-semibold text-gray-600">
-          <span>Roll No</span>
+<div className="hidden md:grid grid-cols-4 bg-white px-6 py-4 text-sm font-semibold text-gray-600">          <span>Roll No</span>
           <span>Name</span>
           <span>Status</span>
           <span>Remark</span>
         </div>
 
         {students.map((stu, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-4 px-6 py-4 border-t text-sm items-center hover:bg-gray-50 transition"
-          >
-            <span className="text-gray-600">{stu.roll_no}</span>
-            <span className="font-medium text-gray-800">{stu.name}</span>
+  <div
+    key={index}
+    className="
+    border-t transition hover:bg-gray-50
+    md:grid md:grid-cols-4 md:px-6 md:py-4 md:items-center
+    p-4 space-y-2 md:space-y-0
+    "
+  >
 
-            <span>
-              {stu.status === "P" ? (
-                <StatusBadge type="present" />
-              ) : (
-                <StatusBadge type="absent" />
-              )}
-            </span>
+    {/* MOBILE VIEW */}
+    <div className="md:hidden flex justify-between">
+      <span className="text-xs text-gray-400">Roll No</span>
+      <span className="text-sm text-gray-700">{stu.roll_no}</span>
+    </div>
 
-            <span className="text-gray-400">
-              {stu.status === "P" ? "Attended" : "Not Present"}
-            </span>
-          </div>
-        ))}
+    <div className="md:hidden flex justify-between">
+      <span className="text-xs text-gray-400">Name</span>
+      <span className="font-medium">{stu.name}</span>
+    </div>
+
+    <div className="md:hidden flex justify-between items-center">
+      <span className="text-xs text-gray-400">Status</span>
+      {stu.status === "P" ? (
+        <StatusBadge type="present" />
+      ) : (
+        <StatusBadge type="absent" />
+      )}
+    </div>
+
+    <div className="md:hidden flex justify-between">
+      <span className="text-xs text-gray-400">Remark</span>
+      <span className="text-sm text-gray-500">
+        {stu.status === "P" ? "Attended" : "Not Present"}
+      </span>
+    </div>
+
+    {/* DESKTOP VIEW */}
+    <span className="hidden md:block text-gray-600">{stu.roll_no}</span>
+    <span className="hidden md:block font-medium text-gray-800">{stu.name}</span>
+
+    <span className="hidden md:block">
+      {stu.status === "P" ? (
+        <StatusBadge type="present" />
+      ) : (
+        <StatusBadge type="absent" />
+      )}
+    </span>
+
+    <span className="hidden md:block text-gray-400">
+      {stu.status === "P" ? "Attended" : "Not Present"}
+    </span>
+  </div>
+))}
       </div>
 
       {students.length === 0 && (

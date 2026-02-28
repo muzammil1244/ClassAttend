@@ -10,12 +10,20 @@ import {
 } from "react-icons/lu";
 import CircleProgress from "../../component/circle_progress"
 import { Read_att } from "./read_att";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 export const Attendance_data = (item) => {
+      let navigate = useNavigate()
 
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
 
     const [ open_create_at , set_open_cteate_at] = useState(false)
     const [ open_attendances , set_attendances] = useState(true)
@@ -111,24 +119,22 @@ console.log(typeof(get_date),"daaaat")
     
     return(
 
-        <div>
+        <div className="w-full overflow-hidden min-h-full p-4 sm:p-0 bg-white">
 {
     open_attendances &&<div>
-<div className="flex justify-between">
-    <div>
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">    <div>
          <h1 className="text-2xl font-bold text-gray-800 mb-4">Attendance Management</h1>
     <p className="text-gray-600 mb-6">View and manage student attendance records for your classes.</p>
     </div>
     <div onClick={()=>{
        set_open_cteate_at(true)
        set_attendances(false)
-    }} className="flex justify-center cursor-pointer items-center gap-2 px-3 py-2 w-fit h-fit bg-white hover:bg-white/30 shadow  duration-100 text-gray-700 font-bold rounded-xl">
+    }} className="flex justify-center cursor-pointer items-center gap-2 px-4 py-2 w-full sm:w-fit bg-white hover:bg-orange-50 shadow text-gray-700 font-bold rounded-xl transition">
        <LuPlus/> Create Attendance
     </div>
    
 </div>
-<div className="bg-white rounded-2xl shadow  max-h-[420px] overflow-y-auto">
-
+<div className="bg-white rounded-2xl shadow max-h-[60vh] sm:max-h-[420px] overflow-y-auto">
 {get_att.map((att, index) => {
 
 const percent = calculatePercentage(Number(att.present), Number(att.total));
@@ -150,8 +156,7 @@ key={index}
 className="border-b last:border-0 hover:bg-orange-50 cursor-pointer transition px-4 py-3"
 >
 
-  <div className="flex items-center justify-between">
-
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     {/* Left : Date */}
     <div className="flex items-center gap-3">
       <div className="bg-orange-100 p-2 rounded-lg">
@@ -169,8 +174,7 @@ className="border-b last:border-0 hover:bg-orange-50 cursor-pointer transition p
     </div>
 
     {/* Center : Stats */}
-    <div className="flex gap-6 text-xs text-center">
-
+<div className="flex justify-between sm:justify-start sm:gap-6 text-xs text-center w-full sm:w-auto">
       <div>
         <p className="font-bold text-gray-800">{att.total}</p>
         <span className="text-gray-400">Total</span>
@@ -189,8 +193,7 @@ className="border-b last:border-0 hover:bg-orange-50 cursor-pointer transition p
     </div>
 
     {/* Right : Percentage */}
-    <div className="flex items-center gap-3 w-[140px]">
-
+<div className="flex items-center gap-3 w-full sm:w-[140px]">
       <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
         <div
           style={{ width: `${percent}%` }}
@@ -218,13 +221,13 @@ className="border-b last:border-0 hover:bg-orange-50 cursor-pointer transition p
 
 {
     open_create_at && <div>
-<Create_att item={item}/>
+<Create_att onclick={()=>set_open_read_att(false)} item={item}/>
 
     </div>
 }
 
 {
-open_read_att && <div>
+open_read_att && <div className="w-full  p-0 ">
   <Read_att item={get_read_data}/>
 </div>
 }

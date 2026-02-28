@@ -3,6 +3,7 @@ import { LuPlus } from "react-icons/lu";
 import CircleProgress from "../../component/circle_progress";
 import { AddStudent } from "./add_student";
 import { Confirm_message } from "../../component/message";
+import { useNavigate } from "react-router-dom";
 
 export const Student = ({ item  }) => {
   const [search, set_search] = useState("");
@@ -15,8 +16,16 @@ const [update_data,set_update]= useState({})
 const [confirm ,set_confirm] = useState(false)
 const [delete_student_id,set_delete_student_id] = useState(null)
   /* ---------------- FETCH STUDENTS ---------------- */
+      let navigate = useNavigate()
 
+ useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
   const filter_student = async () => {
+   
     try {
       const params = new URLSearchParams();
 
@@ -105,10 +114,10 @@ const [delete_student_id,set_delete_student_id] = useState(null)
 
   return (
     <>
-     {read_student &&<div className="w-full h-full   bg-white ">
+     {read_student &&<div className="w-full min-h-full bg-white p-4 sm:p-6 overflow-x-hidden">
       {/* Header */}
-      <div className="flex flex-col gap-3 mb-4">
-        <h1 className="text-2xl font-semibold text-orange-500">
+<div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+          <h1 className="text-2xl font-semibold text-orange-500">
           Student Operations
         </h1>
 
@@ -116,30 +125,29 @@ const [delete_student_id,set_delete_student_id] = useState(null)
           <input
             type="search"
             placeholder="Search student..."
-            className="border rounded-xl px-3 py-2 w-60"
+           className="border rounded-xl px-3 py-2 w-full sm:w-60"
             onChange={(e) => set_search(e.target.value)}
           />
 
           <button onClick={()=>{
             set_add_student(true)
             set_read_student(false)
-          }} className="bg-orange-400 hover:bg-orange-500 text-white rounded-xl flex gap-2 px-4 py-2 items-center">
+          }} className="bg-white hover:bg-slate-50 rounded-xl shadow text-gray-700 flex gap-2 px-4 py-2 items-center justify-center sm:justify-start">
             <LuPlus /> Add
           </button>
         </div>
       </div>
 
       {/* Student Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {students.map((stu) => (
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 p-4 sm:p-5">        {students.map((stu) => (
           <div
             key={stu.id}
             onClick={() => student_report(stu)}
             className="relative cursor-pointer bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-lg transition"
           >
             {/* Score Circle */}
-            <div className="absolute top-3 right-3">
-              {loadingId === stu.id ? (
+<div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                {loadingId === stu.id ? (
                 <p className="text-xs text-gray-400">Loading...</p>
               ) : scores[stu.id] !== undefined ? (
                 <CircleProgress size={50} value={scores[stu.id]} />
@@ -166,8 +174,7 @@ const [delete_student_id,set_delete_student_id] = useState(null)
               Password : {stu.password}
             </p>
 
-            <div className="text-xs flex  justify-between text-blue-500 mt-3">
-              Click to View Attendance % 
+<div className="text-xs flex flex-col sm:flex-row sm:items-center justify-between text-blue-500 mt-3 gap-2">              Click to View Attendance % 
               
               <div className="flex gap-2 items-center justify-center ">
               <span onClick={()=>{

@@ -4,8 +4,19 @@ import { SlLock, SlPhone } from "react-icons/sl";
 
 import Text_input from "../../component/inputfiled";
 import Ok_button, { Delete_button } from "../../component/buttons";
+import { Confirm_message } from "../../component/message";
+import { useNavigate } from "react-router-dom";
 
 export const Crud_teacher = () => {
+    let navigate = useNavigate()
+
+
+  useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
   // ✅ Form State
   const [formData, setFormData] = useState({
 
@@ -23,7 +34,8 @@ export const Crud_teacher = () => {
   // ✅ For Update Mode
   const [editIndex, setEditIndex] = useState(null);
 
-
+  const [ confirm_delete,set_confirm_delete]=useState(false)
+const [delete_teacher_id,set_delete_teacher] =useState(0)
   // api call
 
   let token = localStorage.getItem("token")
@@ -113,9 +125,9 @@ export const Crud_teacher = () => {
 
 
   // ✅ Delete Teacher
-  const handleDelete = async (index) => {
+  const handleDelete = async () => {
     try {
-      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/${teachers[index].id}`, {
+      let response = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/teacher/${delete_teacher_id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,6 +141,7 @@ export const Crud_teacher = () => {
       console.log("data have deleted successfully")
 
       read_teacher()
+      set_confirm_delete(false)
     } catch (error) {
 
     }
@@ -158,7 +171,7 @@ export const Crud_teacher = () => {
     <div className="grid grid-cols-2 gap-6 h-full">
 
       {/* ================= FORM ================= */}
-      <div className="bg-white/70 backdrop-blur-xl shadow-xl rounded-3xl p-8 overflow-auto">
+      <div className="bg-white backdrop-blur-xl shadow-xl rounded-3xl p-8 overflow-auto">
 
         <h2 className="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">
           {editIndex !== null ? "Update Teacher" : "Add New Teacher"}
@@ -173,7 +186,7 @@ export const Crud_teacher = () => {
               <LuAtSign className="text-gray-400 mr-2" />
               <input
                 type="email"
-                placeholder="Enter Email"
+                placeholder="Enter User ID"
                 value={formData.email}
                 onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
                 className="w-full p-3 outline-none bg-transparent"
@@ -260,7 +273,7 @@ export const Crud_teacher = () => {
       </div>
 
       {/* ================= LIST ================= */}
-      <div className="bg-white/70 backdrop-blur-xl shadow-xl overflow-y-auto rounded-3xl p-6 flex flex-col h-full">
+      <div className="bg-white backdrop-blur-xl shadow-xl overflow-y-auto rounded-3xl p-6 flex flex-col h-full">
 
         <h1 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">
           Teacher List
@@ -302,7 +315,9 @@ export const Crud_teacher = () => {
                   </button>
 
                   <button
-                    onClick={() => handleDelete(index)}
+                    onClick={() =>{
+                      set_delete_teacher(teacher.id)
+                      set_confirm_delete(true)}}
                     className="px-4 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200"
                   >
                     Delete
@@ -316,6 +331,26 @@ export const Crud_teacher = () => {
       </div>
 
     </div>
+
+    {
+      confirm_delete && 
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      
+          <div className="animate-scaleIn">
+            <Confirm_message
+            cancel={()=>set_confirm_delete(false)}
+            ok={()=>handleDelete()}
+              heading={"Delete Student"}
+              message={"Are you sure you want to delete this student?"}
+              onCancel={() => set_confirm_delete(false)}
+              onConfirm={() => {
+                set_confirm_delete(false);
+              }}
+            />
+          </div>
+      
+        </div>
+    }
   </div>
 );
 

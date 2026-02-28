@@ -3,14 +3,24 @@ import { LuSearch } from "react-icons/lu"
 
 import Text_input from "../../component/inputfiled"
 import Ok_button, { Delete_button } from "../../component/buttons"
+import { Confirm_message } from "../../component/message"
+import { useNavigate } from "react-router-dom"
 
 
 export const Crud_subjects = () => {
+      let navigate = useNavigate()
 
+useEffect(()=>{
+let token = localStorage.getItem("token")
+if(!token){
+navigate("/login")
+}
+},[])
   const [subjects, setSubjects] = useState([])
   const [subName, setSubName] = useState("")
   const [search, setSearch] = useState("")
-
+  const [delete_id ,set_delete_id] = useState(null)
+const [ open_message,set_open_message] = useState(false)
 
   const token = localStorage.getItem("token")
   // ✅ READ SUBJECTS
@@ -68,9 +78,9 @@ export const Crud_subjects = () => {
   }
 
   // ✅ DELETE SUBJECT
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/subject/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_DOMAIN}/hod/delete/subject/${delete_id}`, {
         method: "DELETE",
           headers: {
           "Content-Type": "application/json",
@@ -166,7 +176,11 @@ export const Crud_subjects = () => {
 
             <Delete_button
               text={"Delete"}
-              onClick={() => handleDelete(item.id)}
+              onClick={() =>{
+                
+               set_delete_id(item.id)
+               set_open_message(true)
+              }}
             />
           </div>
         ))}
@@ -175,6 +189,26 @@ export const Crud_subjects = () => {
     </div>
 
   </div>
+
+     {
+            open_message && 
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            
+                <div className="animate-scaleIn">
+                  <Confirm_message
+                  cancel={()=>set_open_message(false)}
+                  ok={()=>handleDelete()}
+                    heading={"Delete subject"}
+                    message={"Are you sure you want to delete this subject?"}
+                    onCancel={() => set_open_message(false)}
+                    onConfirm={() => {
+                      set_open_message(false);
+                    }}
+                  />
+                </div>
+            
+              </div>
+          }
 </div>
 
   )
