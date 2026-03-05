@@ -15,10 +15,7 @@ import { useNavigate } from "react-router-dom"
 export const Create_Classes = ({ class_data, setOpen_manage_class }) => {
     let navigate = useNavigate()
 
-   useEffect(()=>{
-    setTimeout(() => {
-        
-    }, 5000);
+useEffect(()=>{
 let token = localStorage.getItem("token")
 if(!token){
 navigate("/login")
@@ -473,87 +470,155 @@ ${isCreated ? "bg-white/30 backdrop-blur-[50px]  pointer-events-none opacity-60"
 
         {/* add students */}
 
-        <div className=" w-ful flex shadow rounded-2xl flex-col gap-3   p-5 ">
-            <h1 className="font-semibold">
-                Add Students
-            </h1>
-            <div className="flex w-ful gap-3 ">
+       <div className="w-full flex flex-col gap-4 shadow rounded-2xl p-6">
+
+  <h1 className="font-semibold text-lg">
+    Add Students
+  </h1>
+
+  <div className="w-full grid grid-cols-2 gap-6">
+
+    {/* FORM */}
+    <div className="w-full min-h-[420px] bg-white shadow rounded-2xl p-6">
+
+      <form className="flex flex-col gap-4">
+
+        <label className="flex items-center gap-3">
+          <LuUserRound />
+          <input
+            value={get_student_data.name}
+            onChange={(e) =>
+              set_student_data((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            className="w-full border-2 border-black rounded-xl px-4 py-2 outline-orange-500"
+            type="text"
+            placeholder="Name"
+          />
+        </label>
+
+        <label className="flex items-center gap-3">
+          <LuAtSign />
+          <input
+            value={get_student_data.email}
+            onChange={(e) =>
+              set_student_data((prev) => ({
+                ...prev,
+                email: e.target.value,
+              }))
+            }
+            className="w-full border-2 border-black rounded-xl px-4 py-2 outline-orange-500"
+            type="email"
+            placeholder="Email"
+          />
+        </label>
+
+        <label className="flex items-center gap-3">
+          <LuLock />
+          <input
+            value={get_student_data.password}
+            onChange={(e) =>
+              set_student_data((prev) => ({
+                ...prev,
+                password: e.target.value,
+              }))
+            }
+            className="w-full border-2 border-black rounded-xl px-4 py-2 outline-orange-500"
+            type="password"
+            placeholder="Password"
+          />
+        </label>
+
+        <label className="flex items-center gap-3">
+          <LuBuilding2 />
+          <input
+            value={get_student_data.roll_no}
+            onChange={(e) =>
+              set_student_data((prev) => ({
+                ...prev,
+                roll_no: e.target.value,
+              }))
+            }
+            className="w-full border-2 border-black rounded-xl px-4 py-2 outline-orange-500"
+            type="number"
+            placeholder="Roll Number"
+          />
+        </label>
+
+        {!update_active ? (
+          <Ok_button onClick={add_student} text={"Create"} />
+        ) : (
+          <Ok_button onClick={update_student_data_fun} text={"Update"} />
+        )}
+
+      </form>
+    </div>
 
 
-                <div className="w-full h-80  bg-white shadow py-4 px-2 shadow rounded-2xl">
+    {/* STUDENT LIST */}
+    <div className="w-full min-h-[420px] flex flex-col gap-4 overflow-y-auto bg-white shadow rounded-2xl p-6">
 
-                    <form className="flex flex-col gap-3" >
+      {get_student.length === 0 ? (
+        <p className="text-center">No Students Found</p>
+      ) : (
+        get_student.map((item) => (
+          <div
+            key={item.id}
+            className="w-full flex flex-col gap-3 bg-orange-200 p-4 rounded-xl"
+          >
 
+            <div className="flex flex-col gap-2">
 
+              <h1 className="text-sm flex items-center gap-2">
+                <LuUserRound /> {item.name}
+              </h1>
 
-                        <label className="flex items-center justify-center  gap-3" ><LuUserRound />
-                            <input value={get_student_data.name} onChange={(e) => set_student_data((prev) => ({ ...prev, name: e.target.value }))} className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="name " name="name" />
-                        </label>
-                        <label className="flex items-center justify-center  gap-3" ><LuAtSign />
-                            <input value={get_student_data.email} onChange={(e) => set_student_data((prev) => ({ ...prev, email: e.target.value }))} className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="email" placeholder="email " name="email" />
-                        </label><label className="flex items-center justify-center  gap-3" ><LuLock />
-                            <input value={get_student_data.password} onChange={(e) => set_student_data((prev) => ({ ...prev, password: e.target.value }))} className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="password" placeholder="password " name="password" />
-                        </label>
-                        <label className="flex items-center justify-center  gap-3" ><LuBuilding2 />
-                            <input value={get_student_data.roll_no} onChange={(e) => set_student_data((prev) => ({ ...prev, roll_no: e.target.value }))} className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="number" placeholder="Roll Number " name="roll_no" />
-                        </label>
+              <h2 className="text-sm flex items-center gap-2">
+                <LuAtSign /> {item.email}
+              </h2>
 
+              <h3 className="text-sm">
+                Roll No : {item.roll_no}
+              </h3>
 
-                        {
-                            !update_active ?
-                                <Ok_button onClick={add_student} text={"Create"} /> :
-                                <Ok_button onClick={update_student_data_fun} text={"Update"} />
-                        }
-
-                    </form>
-                </div>
-
-                <div className="w-full flex flex-col gap-4  items-center overflow-y-scroll justify-center h-80  bg-white shadow rounded-2xl">
-                    {
-                        get_student.length === 0 ? (
-                            <p>No Students Found</p>
-                        ) : (
-                            get_student.map((item) => (
-
-                                <div key={item.id} className="w-full flex gap-5 flex-col bg-orange-100 p-4 rounded-2xl">
-
-                                    <div className="flex flex-col gap-2">
-                                        <h1 className="text-sm flex items-center gap-2">
-                                            <LuUserRound /> {item.name}
-                                        </h1>
-
-                                        <h2 className="text-sm flex items-center gap-2">
-                                            <LuAtSign /> {item.email}
-                                        </h2>
-
-                                        <h3 className="text-sm">
-                                            Roll No : {item.roll_no}
-                                        </h3>
-                                    </div>
-
-                                    <div className="flex gap-4">
-                                        <Ok_button onClick={() => {
-                                            set_update_active(true)
-                                            set_update_student_data(item)
-                                            set_student_data((prev) => ({ ...prev, name: item.name, email: item.email, password: item.password, roll_no: item.roll_no, class_id: item.class_id }))
-
-                                        }} text={"Update"} />
-                                        <Delete_button onClick={() => delete_students(item.id)} text={"Delete"} />
-                                    </div>
-
-                                </div>
-
-                            ))
-                        )
-                    }
-
-
-
-                </div>
             </div>
 
+            <div className="flex gap-3">
 
-        </div>
+              <Ok_button
+                onClick={() => {
+                  set_update_active(true);
+                  set_update_student_data(item);
+
+                  set_student_data((prev) => ({
+                    ...prev,
+                    name: item.name,
+                    email: item.email,
+                    password: item.password,
+                    roll_no: item.roll_no,
+                    class_id: item.class_id,
+                  }));
+                }}
+                text={"Update"}
+              />
+
+              <Delete_button
+                onClick={() => delete_students(item.id)}
+                text={"Delete"}
+              />
+
+            </div>
+
+          </div>
+        ))
+      )}
+
+    </div>
+
+  </div>
+</div>
 
 
         {/* add subjects and teachers to class */}

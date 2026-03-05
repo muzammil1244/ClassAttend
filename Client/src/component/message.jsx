@@ -121,17 +121,7 @@ export const Confirm_message = ({ heading, message, ok, cancel }) => (
     </div>
 
     {/* Animation */}
-    <style>
-      {`
-        @keyframes scaleIn {
-          from { transform: scale(0.9); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        .animate-scaleIn {
-          animation: scaleIn 0.18s ease-out;
-        }
-      `}
-    </style>
+   
 
   </div>
 );

@@ -139,7 +139,7 @@ return (
 
             <select
                 onChange={(e)=> set_coruse_id(e.target.value)}
-                className="px-4 py-2 rounded-xl border bg-white focus:ring-2 ring-orange-400 outline-none"
+                className="px-4 py-2 rounded-xl border border-gray-200   bg-white focus:ring-2 ring-blue-400 outline-none"
             >
                 <option value="">Select Course</option>
                 {get_course.length

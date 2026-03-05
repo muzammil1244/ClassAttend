@@ -227,7 +227,7 @@ const StatCard = ({ icon, label, value, highlight, danger }) => {
 const StatusBadge = ({ type }) => {
   if (type === "present") {
     return (
-      <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-semibold">
+      <span className="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-semibold">
         Present
       </span>
     );

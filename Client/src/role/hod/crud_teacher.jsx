@@ -10,8 +10,7 @@ import { useNavigate } from "react-router-dom";
 export const Crud_teacher = () => {
     let navigate = useNavigate()
 
-
-  useEffect(()=>{
+useEffect(()=>{
 let token = localStorage.getItem("token")
 if(!token){
 navigate("/login")

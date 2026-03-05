@@ -76,9 +76,7 @@ const [open_att,set_open_att] = useState(false)
 
     useEffect(()=>{
 let token = localStorage.getItem("token")
-if(!token){
-navigate("/login")
-}
+
 },[])
     const courses = async () => {
 
@@ -180,12 +178,7 @@ if(!get_courseId_date.date){
             return console.log(error)
         }
     }
-useEffect(()=>{
-let token = localStorage.getItem("token")
-if(token){
-navigate("/login")
-}
-},[])
+
 // const subject_scores ()=>{
 //       if (!get_courseId_date.course > 0) {
 //             console.log("course id not found ", get_courseId_date)

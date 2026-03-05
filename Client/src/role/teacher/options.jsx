@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Student } from "./student";
 import { Attendance_data } from "./Attedance";
 import { LuUsers, LuClipboardList, LuArrowLeft } from "react-icons/lu";
