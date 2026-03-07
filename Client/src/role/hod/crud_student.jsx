@@ -190,7 +190,7 @@ useEffect(()=>{
     <option value="">Select Course</option>
     {get_courses.length > 0 &&
       get_courses.map((item, index) => (
-        <option key={index} value={item.id}>
+        <option className=" uppercase" key={index} value={item.id}>
           {item.name}
         </option>
       ))}
@@ -204,7 +204,7 @@ useEffect(()=>{
     <option value="">Select Class</option>
     {get_classes.length > 0 ? (
       get_classes.map((item, index) => (
-        <option key={index} value={item.id}>
+        <option className=" uppercase" key={index} value={item.id}>
           {item.class_name} {item.class_year}
         </option>
       ))

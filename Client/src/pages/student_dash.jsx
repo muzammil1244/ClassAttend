@@ -250,7 +250,7 @@ att_data()
           className="bg-white rounded-2xl shadow-md p-5 border-l-4 border-orange-400 hover:shadow-lg transition"
         >
           {/* Subject Name */}
-          <h3 className="font-semibold text-gray-800 text-md mb-3">
+          <h3 className="font-semibold uppercase text-gray-800 text-md mb-3">
             {item.subject_name}
           </h3>
 
@@ -319,7 +319,7 @@ att_data()
 
           <tbody>
             {get_att_data?.map((item, index) => (
-              <tr key={index} className="border-b">
+              <tr key={index} className="border-b uppercase">
                 <td className="p-3">{item.subject}</td>
 
                 <td className="p-3">

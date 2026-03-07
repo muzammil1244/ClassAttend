@@ -2,6 +2,10 @@ import { FaChalkboardTeacher, FaCheck, FaCheckCircle, FaUserGraduate, FaUserTie 
 import { LuDatabase, LuSheet } from "react-icons/lu"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import image1 from "/src/att_image/img1.png"
+import image2 from "/src/att_image/img2.png"
+import image3 from "/src/att_image/img3.png"
+
 export const Landing = () => {
 let navigate = useNavigate()
 const container = {
@@ -114,7 +118,7 @@ const item = {
         <div className="w-full h-[260px] sm:h-[340px] lg:h-[420px] flex justify-center items-center">
             <img
             
-                src="./src/att image/Screenshot 2026-02-26 013242.png"
+                src={image1}
                 alt="Attendance Preview"
                 className="max-w-full max-h-full object-contain"
             />
@@ -325,14 +329,14 @@ Teachers can mark attendance and manage classes, Students can track their attend
 <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-2xl">
       {/* Base Image */}
       <img
-        src="./src/att image/Screenshot (53).png"
+        src={image2}
         alt="Dashboard"
         className="w-full rounded-xl shadow-lg"
       />
 
       {/* Overlay Phone */}
       <img
-        src="./src/att image/Screenshot (54).png"
+        src={image3}
         alt="Mobile View"
 className="
 absolute

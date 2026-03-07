@@ -308,7 +308,11 @@ const present = get_course_score.present_student || 0;
 const total = get_course_score.total_student || 0;
 const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
     return (
-        <div className="w-screen p-3 h-screen bg-slate-100">
+        <div className="w-screen h-screen p-3  bg-slate-100">
+
+          <div className=" w-screen justify-around items-center flex  h-screen sm:block md:hidden lg:hidden absolute top-0 bg-white">
+<h1 className="text-black text-2xl ">only desktop supported</h1>
+          </div>
             <div className="grid gap-2   h-full w-full  grid-cols-5">
 
 
@@ -446,7 +450,7 @@ const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
 
   {/* ===== Header ===== */}
   <div className="mb-6 flex items-center justify-between rounded-3xl bg-white p-5 shadow-md">
-    <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+    <h1 className="flex uppercase items-center gap-3 text-2xl font-bold text-gray-800">
       <LuActivity className="text-blue-500" />
       {get_courseId_date.course_name || "Course"} Activity
     </h1>
@@ -466,6 +470,7 @@ const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
     {/* Filters */}
     <div className="flex w-full max-w-xs flex-col gap-4">
       <select
+        
         onChange={(e) => {
           const selectedId = Number(e.target.value);
           const selectedCourse = get_courses.find(item => item.id === selectedId);
@@ -476,11 +481,11 @@ const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
             course_name: selectedCourse?.name || ""
           }));
         }}
-        className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+        className="rounded-xl uppercase border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
       >
         <option value="0">Select Course</option>
         {get_courses.map(item => (
-          <option key={item.id} value={item.id}>
+          <option className=" uppercase" key={item.id} value={item.id}>
             {item.name}
           </option>
         ))}
@@ -570,7 +575,7 @@ const percentage = total ? ((present / total) * 100).toFixed(1) : 0;
         >
           <option value="0">Select Class</option>
           {get_classes.map((item) => (
-            <option key={item.id} value={item.id}>
+            <option className=" uppercase" key={item.id} value={item.id}>
               {item.class_name} {item.class_year}
             </option>
           ))}

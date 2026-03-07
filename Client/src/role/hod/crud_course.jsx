@@ -107,7 +107,7 @@ const [ open_al_message,set_open_al_message] = useState(false)
           <div className="relative">
             <input
               value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
+              onChange={(e) => setCourseName(e.target.value.toUpperCase())}
               placeholder="Enter Course Name..."
               className="w-full border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition px-12 py-3 rounded-xl outline-none"
             />

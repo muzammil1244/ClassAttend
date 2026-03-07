@@ -97,9 +97,9 @@ navigate("/login")
 
         {/* CLASS TITLE */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h2 className="text-lg uppercase font-semibold text-gray-800 flex items-center gap-2">
             <LuSchool className="text-orange-500" />
-            {cls.class_name}
+            {cls.class_name}  {cls.year}
           </h2>
 
           <span className="text-xs bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
@@ -109,7 +109,7 @@ navigate("/login")
 
         {/* BADGES */}
         <div className="flex flex-wrap gap-2 mb-4">
-          <span className="bg-blue-50 text-blue-600 text-xs px-3 py-1 rounded-full">
+          <span className="bg-blue-50 uppercase text-blue-600 text-xs px-3 py-1 rounded-full">
             {cls.course_name}
           </span>
 

@@ -249,11 +249,11 @@ set_particular_att(data)
 
                         <select
                             onChange={(e) => set_selected_course_id(Number(e.target.value))}
-                            className="border border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border uppercase border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
                             <option value="">Select Course</option>
                             {get_courses.map((item) => (
-                                <option key={item.id} value={item.id}>
+                                <option className=" uppercase" key={item.id} value={item.id}>
                                     {item.name}
                                 </option>
                             ))}
@@ -261,23 +261,23 @@ set_particular_att(data)
 
                         <select
                             onChange={(e) => set_selected_class_id(Number(e.target.value))}
-                            className="border border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border uppercase border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
-                            <option value="">Select Class</option>
+                            <option  className=" uppercase" value="">Select Class</option>
                             {get_classes.map((item) => (
                                 <option key={item.id} value={item.id}>
-                                    {item.class_name}
+                                    {item.class_name}{item.class_year}
                                 </option>
                             ))}
                         </select>
 
                         <select
                             onChange={(e) => set_select_subject_id(e.target.value)}
-                            className="border border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border uppercase border-gray-300 rounded-xl px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
                             <option value="">Select Subject</option>
                             {get_subjects.map((item) => (
-                                <option key={item.id} value={item.id}>
+                                <option  className=" uppercase" key={item.id} value={item.id}>
                                     {item.name}
                                 </option>
                             ))}

@@ -442,7 +442,7 @@ ${isCreated ? "bg-white/30 backdrop-blur-[50px]  pointer-events-none opacity-60"
 
 
                 <label className="flex items-center justify-center  gap-3" ><LuBuilding2 />
-                    <input value={get_class_data.name} onChange={(e) => set_class_data((prev) => ({ ...prev, name: e.target.value }))} className="w-full outline-orange-500 px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="Class Name " name="class" />
+                    <input value={get_class_data.name} onChange={(e) => set_class_data((prev) => ({ ...prev, name: e.target.value.toUpperCase() }))} className="w-full outline-orange-500 px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="text" placeholder="Class Name " name="class" />
                 </label>
                 <label className="flex items-center justify-center  gap-3" ><LuBuilding2 />
                     <input value={get_class_data.year} onChange={(e) => set_class_data((prev) => ({ ...prev, year: e.target.value }))} className="w-full outline-orange-500  px-4 border-black border-[2px]  rounded-2xl p-[5px]" type="number" placeholder="Year " name="year" />
@@ -452,7 +452,7 @@ ${isCreated ? "bg-white/30 backdrop-blur-[50px]  pointer-events-none opacity-60"
                         <option>select course</option>
                         {
                             get_course.length ? get_course.map((item, index) => (
-                                <option key={index} value={item.id}>{item.name}</option>
+                                <option className=" uppercase" key={index} value={item.id}>{item.name}</option>
                             )) : <option>no course to select </option>
                         }
 
@@ -717,7 +717,7 @@ ${isCreated ? "bg-white/30 backdrop-blur-[50px]  pointer-events-none opacity-60"
             </div>
 
             <div className="w-full flex gap-3 items-center">
-                <Ok_button onClick={() => submit_assigned()} text={acitve_delete_subject_teacher_assign ? "Update" : "Submit"} /> <Cancel_button onClick={() => setFinalAssign([])} text={"Reset"} />
+                <Ok_button onClick={() => submit_assigned()} text={acitve_delete_subject_teacher_assign ? "Submit" : "Update"} /> <Cancel_button onClick={() => setFinalAssign([])} text={"Reset"} />
             </div>
         </div>
 

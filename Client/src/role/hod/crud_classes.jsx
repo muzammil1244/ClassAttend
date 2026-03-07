@@ -144,7 +144,7 @@ return (
                 <option value="">Select Course</option>
                 {get_course.length
                     ? get_course.map((item)=>(
-                        <option key={item.id} value={item.id}>
+                        <option className=" uppercase" key={item.id} value={item.id}>
                             {item.name}
                         </option>
                     ))

@@ -67,7 +67,8 @@ const [ open_message,set_open_message] = useState(false)
 
       if (res.ok) {
         setSubName("")
-        fetchSubjects() // refresh list
+        fetchSubjects()
+         // refresh list
       } else {
         alert(data.message)
       }
@@ -90,6 +91,7 @@ const [ open_message,set_open_message] = useState(false)
 
       if (res.ok) {
         fetchSubjects()
+        set_open_message(false)
       }
 
     } catch (err) {
@@ -131,7 +133,7 @@ const [ open_message,set_open_message] = useState(false)
           name={"subjects"}
           type={"text"}
           lbname={"subject"}
-          onChange={(value) => setSubName(value)}
+          onChange={(value) => setSubName(value.toUpperCase())}
         />
 
         <Ok_button text={"Add Subject"} />
