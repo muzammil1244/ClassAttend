@@ -1,5 +1,5 @@
 
-import { rectSortingStrategy } from "@dnd-kit/sortable"
+
 import pool from "../connections/db_connent.js"
 import bcrypt from "bcrypt"
 
