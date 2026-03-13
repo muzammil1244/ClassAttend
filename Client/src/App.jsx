@@ -13,7 +13,7 @@ function App() {
   return (
     <BrowserRouter>
 
-      <Routes>
+      <Routes >
         <Route path='/' element={<Landing/>}/>
         <Route path="/teacher/dashboard" element={<Teacher_dash />} />
         <Route path="/hod/dashboard" element={<Hod_dash />} />
