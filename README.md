@@ -88,10 +88,8 @@ The system supports **three roles** — HOD, Teacher, and Student — each with 
 <table>
   <tr>
     <td align="center"><b>Teacher Dashboard — Class Selection</b></td>
-    <td align="center"><b>Students & Attendance Menu</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/teacher-classes.png" alt="Teacher Dashboard" width="100%"/></td>
     <td><img src="docs/screenshots/teacher-dashboard.png" alt="Teacher Menu" width="100%"/></td>
   </tr>
   <tr>
